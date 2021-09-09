@@ -1,7 +1,7 @@
 /.idea/
 /env/
 /venv/
-/static/
+/config/static/
 *.log
 .env
 db.sqlite3
