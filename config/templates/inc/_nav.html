@@ -1,9 +1,17 @@
 {% load static %}
 <div class="dropdown">
     <ul class="nav nav-pills">
-        <li><a href="{% url 'home' %}">Главная</a></li>
-        <li><a href="{% url 'portfolio' %}">Портфолио</a></li>
-        <li><a href="{% url 'blog' %}">Блог</a></li>
-        <li><a href="{% url 'contact' %}">Контакты</a></li>
+        {% url 'home' as home_url %}
+        <li {% if request.get_full_path == home_url %}class="active" {% endif %}>
+            <a href="{{ home_url }}">Главная</a></li>
+        {% url 'portfolio' as portfolio_url %}
+        <li {% if request.get_full_path == portfolio_url %}class="active" {% endif %}>
+            <a href="{{ portfolio_url }}">Портфолио</a></li>
+        {% url 'blog' as blog_url %}
+        <li {% if request.get_full_path == blog_url %}class="active" {% endif %}>
+            <a href="{{ blog_url }}">Блог</a></li>
+        {% url 'contact' as contact_url %}
+        <li {% if request.get_full_path == contact_url %}class="active" {% endif %}>
+            <a href="{{ contact_url }}">Контакты</a></li>
     </ul>
 </div>
