@@ -1,7 +1,21 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.views.generic import ListView, DetailView
 
-from .models import Post, Category
+from config.settings import DOMAIN_NAME
+from .models import Post, Category, Tag
+
+
+class Blog(ListView):
+    model = Post
+    template_name = 'blog/blog.html'
+    context_object_name = 'posts'
+    paginate_by = 10
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = DOMAIN_NAME
+        return context
 
 
 def index(request):
@@ -10,10 +24,6 @@ def index(request):
 
 def portfolio(request):
     return render(request, 'blog/portfolio.html')
-
-
-def blog(request):
-    return render(request, 'blog/blog.html')
 
 
 def contact(request):
@@ -25,7 +35,8 @@ def test(request):
 
 
 def get_category(request, slug):
-    # blogs = Post.objects.filter(category_id=category_id)
-    # category = Category.objects.get(pk=category_id)
-    # return render(request, 'blog/category.html', {'blogs': blogs, 'category': category})
     return render(request, 'blog/category.html')
+
+
+def get_post(request, slug):
+    return render(request, 'blog/post.html')

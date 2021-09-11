@@ -28,6 +28,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ['SECRET_KEY']
 
+DOMAIN_NAME = os.environ['DOMAIN_NAME']
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -146,7 +148,7 @@ CKEDITOR_UPLOAD_PATH = "uploads/"
 
 CKEDITOR_CONFIGS = {
     'default': {
-        'skin': 'moono-lisa',
+        'skin': 'moono-liza',
         # 'skin': 'office2013',
         'toolbar_Basic': [
             ['Source', '-', 'Bold', 'Italic']

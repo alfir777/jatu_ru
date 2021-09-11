@@ -6,3 +6,5 @@
 *.log
 .env
 db.sqlite3
+/config/blog/migrations/
+/config/media/
