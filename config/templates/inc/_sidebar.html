@@ -3,8 +3,8 @@
 {% load sidebar %}
 <aside class="right-sidebar">
     <div class="widget">
-        <form class="form-search">
-            <input class="form-control" type="text" placeholder="Search..">
+        <form action="{% url 'search' %}" method="get" class="form-search">
+            <input class="form-control" type="text" name="s" placeholder="Search..">
         </form>
     </div>
         {% show_menu %}
