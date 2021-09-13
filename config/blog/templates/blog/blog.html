@@ -7,9 +7,8 @@
 <div class="row mar-bot40">
     <div class="col-md-offset-3 col-md-6">
         <div class="sections-header">
-            <h2>Blog</h2>
-            <p>Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet consectetur, adipisci velit, sed quia non
-                numquam.</p>
+            <h2>Дисклеймер</h2>
+            <p>О том, что это дисклеймер =)</p>
         </div>
     </div>
 </div>
@@ -17,56 +16,6 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
-                <article>
-                    <div class="post-image">
-                        <div class="post-heading">
-                            <h3><a href="#">This is an example of standard post format</a></h3>
-                        </div>
-                        <img src="{% static 'img/portfolio/img1.jpg' %}" alt=""/>
-                    </div>
-                    <p>
-                        Qui ut ceteros comprehensam. Cu eos sale sanctus eligendi, id ius elitr saperet, ocurreret
-                        pertinacia pri an. No mei nibh consectetuer, semper laoreet perfecto ad qui, est rebum nulla
-                        argumentum ei. Fierent adipisci iracundia est ei, usu timeam persius ea. Usu ea justo malis, pri
-                        quando everti electram ei, ex homero omittam salutatus sed.
-                    </p>
-                    <div class="bottom-article">
-                        <ul class="meta-post">
-                            <li><i class="icon-calendar"></i><a href="#"> Mar 23, 2013</a></li>
-                            <li><i class="icon-user"></i><a href="#"> Admin</a></li>
-                            <li><i class="icon-folder-open"></i><a href="#"> Blog</a></li>
-                            <li><i class="icon-comments"></i><a href="#">4 Comments</a></li>
-                        </ul>
-                        <a href="#" class="pull-right">Continue reading <i class="icon-angle-right"></i></a>
-                    </div>
-                </article>
-                <article>
-                    <div class="post-video">
-                        <div class="post-heading">
-                            <h3><a href="#">Amazing video post format here</a></h3>
-                        </div>
-                        <div class="video-container">
-                            <iframe src="http://player.vimeo.com/video/30585464?title=0&amp;byline=0">
-                            </iframe>
-                        </div>
-                    </div>
-                    <p>
-                        Qui ut ceteros comprehensam. Cu eos sale sanctus eligendi, id ius elitr saperet, ocurreret
-                        pertinacia pri an. No mei nibh consectetuer, semper laoreet perfecto ad qui, est rebum nulla
-                        argumentum ei. Fierent adipisci iracundia est ei, usu timeam persius ea. Usu ea justo malis, pri
-                        quando everti electram ei.
-                    </p>
-                    <div class="bottom-article">
-                        <ul class="meta-post">
-                            <li><i class="icon-calendar"></i><a href="#"> Mar 23, 2013</a></li>
-                            <li><i class="icon-user"></i><a href="#"> Admin</a></li>
-                            <li><i class="icon-folder-open"></i><a href="#"> Blog</a></li>
-                            <li><i class="icon-comments"></i><a href="#">4 Comments</a></li>
-                        </ul>
-                        <a href="#" class="pull-right">Continue reading <i class="icon-angle-right"></i></a>
-                    </div>
-                </article>
-
                 {% for post in posts %}
                 <article>
                     <div class="post-video">
@@ -93,12 +42,9 @@
                     </div>
                 </article>
                 {% endfor %}
-                <div id="pagination">
-                    <span class="all">Page 1 of 3</span>
-                    <span class="current">1</span>
-                    <a href="#" class="inactive">2</a>
-                    <a href="#" class="inactive">3</a>
-                </div>
+
+                {% include 'inc/_pagination.html' %}
+
             </div>
             <div class="col-lg-4">
 
