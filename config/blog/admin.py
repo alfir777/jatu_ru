@@ -23,10 +23,10 @@ class PostAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'title')
     search_fields = ('title', 'content')
     list_editable = ('is_published',)
-    list_filter = ('is_published', 'category')
+    list_filter = ('is_published', 'category', 'tags')
     readonly_fields = ('get_photo', 'views', 'created_at', 'updated_at')
     fields = ('title', 'slug', 'author', 'category', 'content', 'photo', 'get_photo', 'is_published', 'views',
-              'created_at', 'updated_at')
+              'created_at', 'updated_at', 'tags')
 
     def get_photo(self, obj):
         if obj.photo:
