@@ -1,5 +1,6 @@
 {% load static %}
 {% load menu %}
+{% load sidebar %}
 <aside class="right-sidebar">
     <div class="widget">
         <form class="form-search">
@@ -7,32 +8,8 @@
         </form>
     </div>
         {% show_menu %}
-    <div class="widget">
-        <h5 class="widgetheading">Latest posts</h5>
-        <ul class="recent">
-            <li>
-                <img src="{% static 'img/blog/1.jpg' %}" class="pull-left" alt=""/>
-                <h6><a href="#">Lorem ipsum dolor sit</a></h6>
-                <p>
-                    Mazim alienum appellantur eu cu ullum officiis pro pri
-                </p>
-            </li>
-            <li>
-                <a href="#"><img src="{% static 'img/blog/2.jpg' %}" class="pull-left" alt=""/></a>
-                <h6><a href="#">Maiorum ponderum eum</a></h6>
-                <p>
-                    Mazim alienum appellantur eu cu ullum officiis pro pri
-                </p>
-            </li>
-            <li>
-                <a href="#"><img src="{% static 'img/blog/3.jpg' %}" class="pull-left" alt=""/></a>
-                <h6><a href="#">Et mei iusto dolorum</a></h6>
-                <p>
-                    Mazim alienum appellantur eu cu ullum officiis pro pri
-                </p>
-            </li>
-        </ul>
-    </div>
+        {% get_popular 5 %}
+
     <div class="widget">
         <h5 class="widgetheading">Popular tags</h5>
         <ul class="tags">
