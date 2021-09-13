@@ -1,82 +1,59 @@
 {% extends 'base.html' %}
+
+{% block title %}
+{{ category.title }} :: {{ block.super }}
+{% endblock %}
+
 {% load static %}
 {% block content %}
-<!-- column content -->
-<div id="main-content">
-    <div class="container">
-        <div class="row">
-            <div class="big-box">
-                <div class="col-lg-12">
-                    <div class="col-md-4">
-                        <div class="box-bg">
-                            <div class="wow bounceInLeft" data-wow-duration="2s" data-wow-delay="0.9s">
-                                <div class="align-center">
-                                    <i class="fa fa-camera-retro fa-5x"></i>
-                                    <h4 class="text-bold">Customizable</h4>
-                                    <p>Lorem ipsum dolor sit amet, mutat graeco volumus ad eam, singulis patrioque
-                                        comprehensam nam no.
-                                        Mei cu dicat voluptaria volumus.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="box-bg">
-                            <div class="wow bounceInLeft" data-wow-duration="2s" data-wow-delay="0.6s">
-                                <div class="align-center">
-                                    <i class="fa fa-shield fa-5x"></i>
-                                    <h4 class="text-bold">Valid HTML5</h4>
-                                    <p>Lorem ipsum dolor sit amet, mutat graeco volumus ad eam, singulis patrioque
-                                        comprehensam nam no.
-                                        Mei cu dicat voluptaria volumus.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="box-bg">
-                            <div class="wow bounceInLeft" data-wow-duration="2s" data-wow-delay="0.2s">
-                                <div class="align-center">
-                                    <i class="fa fa-circle fa-5x"></i>
-                                    <h4 class="text-bold">Responsive</h4>
-                                    <p>Lorem ipsum dolor sit amet, mutat graeco volumus ad eam, singulis patrioque
-                                        comprehensam nam no.
-                                        Mei cu dicat voluptaria volumus.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="container">
-        <div class="row">
-            <div class="wow bounceInRight">
-                <div class="col-lg-6">
-                    <h4>Maecenas luctus</h4>
-                    <p>Lorem ipsum dolor sit amet, mutat graeco volumus ad eam, singulis patrioque comprehensam nam no.
-                        Mei cu dicat voluptaria volumus.</p>
-                    <a href="#" class="thumbnail">
-                        <img src="{% static 'img/thumbnails/outline-1.jpg' %}" alt="">
-                    </a>
-                </div>
-            </div>
-            <div class="wow bounceInLeft">
-                <div class="col-lg-6">
-                    <h4>Maecenas luctus</h4>
-                    <p>Lorem ipsum dolor sit amet, mutat graeco volumus ad eam, singulis patrioque comprehensam nam no.
-                        Mei cu dicat voluptaria volumus.</p>
-                    <a href="#" class="thumbnail">
-                        <img src="{% static 'img/thumbnails/ipad.jpg' %}" alt="">
-                    </a>
-                </div>
-            </div>
+<div class="row mar-bot40">
+    <div class="col-md-offset-3 col-md-6">
+        <div class="sections-header">
+            <h2>Дисклеймер</h2>
+            <p>О том, что это дисклеймер =)</p>
         </div>
     </div>
 </div>
-<!-- end column content -->
-{% endblock %}
+<section id="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                {% for post in posts %}
+                <article>
+                    <div class="post-video">
+                        <div class="post-heading">
+                            <h3><a href="#">{{ post.title }}</a></h3>
+                        </div>
+                        {% if post.photo %}
+                        <img src="{{ post.photo.url }}" alt=""/>
+                        {% else %}
+                        <img src="https://picsum.photos/id/1060/536/354/?blur=2" alt=""/>
+                        {% endif %}
+                    </div>
+                    <p>
+                        {{ post.content|safe|linebreaks|truncatewords:50 }}
+                    </p>
+                    <div class="bottom-article">
+                        <ul class="meta-post">
+                            <li><i class="icon-calendar"></i><a href="#">{{ post.created_at|date:"Y-m-d H:i:s" }}</a></li>
+                            <li><i class="icon-user"></i><a href="#">{{ post.author }}</a></li>
+                            <li><i class="icon-folder-open"></i><a href="#">{{ post.category }}</a></li>
+                            <li><i class="icon-comments"></i><a href="#">4 Comments</a></li>
+                        </ul>
+                        <a href="{{ post.get_absolute_url }}" class="pull-right">Continue reading <i class="icon-angle-right"></i></a>
+                    </div>
+                </article>
+                {% endfor %}
+
+                {% include 'inc/_pagination.html' %}
+
+            </div>
+            <div class="col-lg-4">
+
+                {% include 'inc/_sidebar.html' %}
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

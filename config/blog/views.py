@@ -19,6 +19,22 @@ class Blog(ListView):
         return context
 
 
+class PostByCategory(ListView):
+    template_name = 'blog/category.html'
+    context_object_name = 'posts'
+    paginate_by = 2
+    allow_empty = False
+
+    def get_queryset(self):
+        return Post.objects.filter(category__slug=self.kwargs['slug'], is_published=True)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = Category.objects.get(slug=self.kwargs['slug'])
+        return context
+
+
+
 def index(request):
     return render(request, 'blog/index.html')
 
@@ -33,10 +49,6 @@ def contact(request):
 
 def test(request):
     return HttpResponse('<h1>TEST</h1>')
-
-
-def get_category(request, slug):
-    return render(request, 'blog/category.html')
 
 
 def get_post(request, slug):
