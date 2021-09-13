@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView
 from django.core.paginator import Paginator
+from django.db.models import F
 
 from config.settings import DOMAIN_NAME
 from .models import Post, Category, Tag
@@ -26,13 +27,25 @@ class PostByCategory(ListView):
     allow_empty = False
 
     def get_queryset(self):
-        return Post.objects.filter(category__slug=self.kwargs['slug'], is_published=True)
+        return Post.objects.filter(category__slug=self.kwargs['slug'], is_published=True).select_related('category')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = Category.objects.get(slug=self.kwargs['slug'])
         return context
 
+
+class GetPost(DetailView):
+    model = Post
+    template_name = 'blog/blog_detail.html'
+    context_object_name = 'post'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        self.object.views = F('views') + 1
+        self.object.save()
+        self.object.refresh_from_db()
+        return context
 
 
 def index(request):
@@ -49,7 +62,3 @@ def contact(request):
 
 def test(request):
     return HttpResponse('<h1>TEST</h1>')
-
-
-def get_post(request, slug):
-    return render(request, 'blog/post.html')

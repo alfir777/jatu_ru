@@ -7,7 +7,7 @@ urlpatterns = [
     path('portfolio/', portfolio, name='portfolio'),
     path('blog/', Blog.as_view(), name='blog'),
     path('contact/', contact, name='contact'),
-    path('category/<str:slug>', PostByCategory.as_view(), name='category'),
-    path('post/<str:slug>', get_post, name='post'),
+    path('blog/category/<str:slug>', PostByCategory.as_view(), name='category'),
+    path('post/<str:slug>', GetPost.as_view(), name='post'),
     path('test/', test, name='test'),
 ]
