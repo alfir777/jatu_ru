@@ -1,12 +1,12 @@
 <div class="widget">
-    <h5 class="widgetheading">Latest posts</h5>
+    <h5 class="widgetheading">Популярные посты</h5>
     <ul class="recent">
         {% for post in posts %}
         <li>
             {% if post.photo %}
-            <span class="border-10"><img src="{{ post.photo.url }}" class="pull-left" width="75" alt=""/></span>
+            <span class="border-10"><img src="{{ post.photo.url }}" class="pull-left" width="75" style="margin-right:5%" alt=""/></span>
             {% else %}
-            <img src="https://picsum.photos/id/1060/536/354/?blur=2" class="pull-left" width="75" alt=""/>
+            <img src="https://picsum.photos/id/1060/536/354/?blur=2" class="pull-left" width="75" style="margin-right:5%" alt=""/>
             {% endif %}
         </li>
         <li>

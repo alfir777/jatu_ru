@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Поиск | {{ block.super }} {% endblock %}
+
+{% block content %}
+<hr>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4">
+            <h1>Регистрация</h1>
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary btn-block">Регистрация</button>
+            </form>
+        </div>
+    </div>
+</div>
+<hr>
+
+{% endblock content %}
