@@ -1,12 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth import logout, login
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.views.generic import ListView, DetailView
+from django.core.mail import send_mail
 from django.db.models import F
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.views.generic import ListView, DetailView
 
-from config.settings import DOMAIN_NAME
-from .forms import UserRegisterForm, UserLoginForm
+from config.settings import DOMAIN_NAME, EMAIL_SENDER, EMAIL_RECIPIEN
+from .forms import UserRegisterForm, UserLoginForm, ContactForm
 from .models import Post, Category, Tag
 
 
@@ -120,7 +121,23 @@ def portfolio(request):
 
 
 def contact(request):
-    return render(request, 'blog/contact.html')
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            mail = send_mail(form.cleaned_data['subject'],
+                             form.cleaned_data['content'],
+                             EMAIL_SENDER,
+                             [EMAIL_RECIPIEN],
+                             fail_silently=True
+                             )
+            if mail:
+                messages.success(request, 'Письмо отправлено')
+                return redirect('contact')
+            else:
+                messages.error(request, 'Ошибка отправки письма')
+    else:
+        form = ContactForm()
+    return render(request, 'blog/contact.html', {'form': form})
 
 
 def test(request):

@@ -31,9 +31,12 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DOMAIN_NAME = os.environ['DOMAIN_NAME']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if os.environ['DEBUG'] == 'True':
+    DEBUG = True
+elif os.environ['DEBUG'] == 'False':
+    DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 # Application definition
 
@@ -45,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'captcha',
     'ckeditor',
     'ckeditor_uploader',
     'blog.apps.BlogConfig',
@@ -144,6 +148,17 @@ MEDIA_URL = '/media/'
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+
+EMAIL_HOST = os.environ['EMAIL_HOST']
+EMAIL_PORT = 465
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
+EMAIL_USER_TLS = False
+EMAIL_USER_SSL = True
+EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
+
+EMAIL_SENDER = os.environ['EMAIL_SENDER']
+EMAIL_RECIPIEN = os.environ['EMAIL_RECIPIEN']
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
