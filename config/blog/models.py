@@ -57,7 +57,7 @@ class Tag(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=255, verbose_name='Заголовок')
     slug = models.SlugField(max_length=255, verbose_name='Url', unique=True)
-    author = models.ForeignKey(User, on_delete=models.PROTECT, related_name='posts')
+    author = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='posts')
     content = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлено')

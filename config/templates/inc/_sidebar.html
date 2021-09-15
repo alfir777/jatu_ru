@@ -7,6 +7,11 @@
             <input class="form-control" type="text" name="s" placeholder="Поиск..">
         </form>
     </div>
+    {% if request.user.is_authenticated %}
+    <div class="widget">
+    <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'blog_add_post' %}">Добавить запись</a></li>
+    </div>
+    {% endif %}
         {% show_menu %}
         {% get_popular 5 %}
         {% get_list_tags %}

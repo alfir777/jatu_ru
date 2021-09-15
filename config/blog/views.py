@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth import logout, login
+from django.contrib.auth import logout, login, get_user
 from django.core.mail import send_mail
 from django.db.models import F
 from django.http import HttpResponse
@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 
 from config.settings import DOMAIN_NAME, EMAIL_SENDER, EMAIL_RECIPIEN
-from .forms import UserRegisterForm, UserLoginForm, ContactForm
+from .forms import UserRegisterForm, UserLoginForm, ContactForm, BlogForm
 from .models import Post, Category, Tag
 
 
@@ -110,6 +110,19 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('user_login')
+
+
+def blog_add_post(request):
+    if request.method == 'POST':
+        form = BlogForm(request.POST)
+        if form.is_valid():
+            form.cleaned_data['author'] = get_user(request)
+            post = Post.objects.create(**form.cleaned_data)
+            return redirect(post)
+        print(form)
+    else:
+        form = BlogForm()
+    return render(request, 'blog/blog_add_post.html', {'form': form})
 
 
 def index(request):
