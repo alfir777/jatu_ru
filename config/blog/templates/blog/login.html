@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %} Поиск | {{ block.super }} {% endblock %}
+{% block title %} Авторизация | {{ block.super }} {% endblock %}
 
 {% block content %}
 <hr>
@@ -9,13 +9,16 @@
     <div class="row">
         <div class="col-lg-4">
 
-            <h1>Авторизация</h1>
-
+            <h2>Авторизация</h2>
+            {% if user.is_authenticated %}
+            <p>Вы уже выполнили вход</p>
+            {% else %}
             <form method="post">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit" class="btn btn-primary btn-block">Авторизация</button>
+                <button type="submit" class="btn btn-primary btn-block">Войти</button>
             </form>
+            {% endif %}
 
         </div>
     </div>

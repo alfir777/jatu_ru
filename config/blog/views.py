@@ -1,5 +1,7 @@
 from django.contrib import messages
-from django.contrib.auth import logout, login, get_user
+from django.contrib.auth import login, get_user
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import send_mail
 from django.db.models import F
 from django.http import HttpResponse
@@ -95,21 +97,19 @@ def register(request):
     return render(request, 'blog/register.html', {'form': form})
 
 
-def user_login(request):
-    if request.method == 'POST':
-        form = UserLoginForm(data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect('home')
-    else:
-        form = UserLoginForm()
-    return render(request, 'blog/login.html', {'form': form})
+class UserLogin(SuccessMessageMixin, LoginView):
+    template_name = 'blog/login.html'
+    redirect_field_name = 'home'
+    redirect_authenticated_user = True
+    authentication_form = UserLoginForm
+    success_messages = 'Вы успешно зарегистрировались'
+
+    def get_success_message(self, cleaned_data):
+        return self.success_messages
 
 
-def user_logout(request):
-    logout(request)
-    return redirect('user_login')
+class UserLogout(LogoutView):
+    next_page = 'home'
 
 
 def blog_add_post(request):
