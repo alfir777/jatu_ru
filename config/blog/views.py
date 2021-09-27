@@ -9,8 +9,8 @@ from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 
 from config.settings import DOMAIN_NAME, EMAIL_SENDER, EMAIL_RECIPIEN
-from .forms import UserRegisterForm, UserLoginForm, ContactForm, BlogForm
-from .models import Post, Category, Tag
+from .forms import UserRegisterForm, UserLoginForm, ContactForm, BlogForm, UserCommentForm, GuestCommentForm
+from .models import Post, Category, Tag, Comment
 
 
 class Blog(ListView):
@@ -65,7 +65,33 @@ class GetPost(DetailView):
         self.object.views = F('views') + 1
         self.object.save()
         self.object.refresh_from_db()
+        comment_list = (
+            Comment.objects.filter(post=self.object).order_by('created_at')
+        )
+        comment_count = Comment.objects.filter(post=self.object).order_by('created_at').count()
+        context['comment_count'] = comment_count
+        context['comments'] = comment_list
+        for comment in comment_list:
+            comment._post_url = self.object.get_absolute_url()
+        context['form'] = UserCommentForm(initial={'post': self.object.slug})
         return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if request.user.is_authenticated:
+            form = UserCommentForm(request.POST)
+        else:
+            form = GuestCommentForm(request.POST)
+        if form.is_valid():
+            form.cleaned_data['author'] = get_user(request)
+            form.cleaned_data['post_id'] = self.object.pk
+            comment = Comment.objects.create(**form.cleaned_data)
+            form.save(request=request, obj=comment, form=form)
+            messages.add_message(request, messages.SUCCESS, 'Комментарий добавлен')
+            return redirect(self.object)
+        else:
+            messages.add_message(request, messages.WARNING, 'Нет прав на добавления комментария')
+            return redirect(self.object)
 
 
 class Search(ListView):
@@ -119,7 +145,6 @@ def blog_add_post(request):
             form.cleaned_data['author'] = get_user(request)
             post = Post.objects.create(**form.cleaned_data)
             return redirect(post)
-        print(form)
     else:
         form = BlogForm()
     return render(request, 'blog/blog_add_post.html', {'form': form})

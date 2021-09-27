@@ -46,7 +46,7 @@
                             <li><i class="icon-user"></i><a href="#">{{ post.author }}</a></li>
                             <li><i class="icon-folder-open"></i><a href="{{ post.category.get_absolute_url }}">{{ post.category }}</a></li>
                             <li><i class="icon-folder-open"></i><a href="#">{{ post.views }}</a></li>
-                            <li><i class="icon-comments"></i><a href="#">4 Comments</a></li>
+                            <li><i class="icon-comments"></i><a href="#">{{comment_count}} комментарий</a></li>
                         </ul>
                     </div>
                     <div class="bottom-article">
@@ -59,6 +59,24 @@
                             {% endif %}
                         </ul>
                     </div>
+                    <h4 class="mt-5">HoBый комментарий</h4>
+                    <form action=""  enctype = "multiparty/form-data"  method="post">
+                        {% csrf_token %}
+
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary btn-block">Добавить комментарий</button>
+                    </form>
+                    {% if comments %}
+                        <div class="mt-5">
+                            {% for comment in comments %}
+                            <div class="my-2 p-2 border">
+                                <h5><b>{{ comment.author }}</b></h5>
+                                <p>{{ comment.content|safe }}</p>
+                                <p class="text-right font-italic">{{ comment.created_at }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </article>
 
             </div>

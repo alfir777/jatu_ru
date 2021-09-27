@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 
@@ -57,7 +56,7 @@ class Tag(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=255, verbose_name='Заголовок')
     slug = models.SlugField(max_length=255, verbose_name='Url', unique=True)
-    author = models.ForeignKey('auth.User', on_delete=models.PROTECT, related_name='posts')
+    author = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='posts')
     content = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлено')
@@ -81,19 +80,19 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    slug = models.SlugField(max_length=255, verbose_name='Url', unique=True)
-    post = models.ForeignKey(Post, on_delete=models.PROTECT, related_name='comments')
-    author = models.ForeignKey(User, on_delete=models.PROTECT, related_name='comments')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='comments')
     content = models.TextField(blank=False)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлено')
     votes = models.IntegerField(default=0, verbose_name='Количество голосов')
     is_published = models.BooleanField(default=False, verbose_name='Опубликовано')
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
 
     def __str__(self):
-        return 'Comment by {} on {}'.format(self.author, self.post)
+        return 'Comment by "{}" on "{}"'.format(self.author, self.post)
 
     class Meta:
-        verbose_name = 'Коментарий'
-        verbose_name_plural = 'Коментарии'
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
         ordering = ['-created_at']

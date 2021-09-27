@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from captcha.fields import CaptchaField
 
-from blog.models import Category
+from blog.models import Category, Comment
 
 
 class BlogForm(forms.Form):
@@ -52,3 +52,38 @@ class UserRegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
+
+
+class UserCommentForm(forms.Form):
+    form = BlogForm
+    content = forms.CharField(label='Текст', widget=forms.Textarea(attrs={"class": "form-control", "rows": 5}))
+
+    class Meta:
+        model = Comment
+        exclude = ('is_published',)
+        widgets = {'form': forms.HiddenInput()}
+        fields = ('content', 'author_id')
+
+    def save(self, request, obj, form):
+        if form.is_valid():
+            obj.author = request.user
+            obj.save()
+
+
+# TODO Реализовать возможность добавления комментариев без авторизации
+class GuestCommentForm(forms.Form):
+    form = BlogForm
+    content = forms.CharField(label='Текст', widget=forms.Textarea(attrs={"class": "form-control", "rows": 5}))
+    captcha = CaptchaField(label='Введите текст с картинки',
+                           error_messages={'invalid': 'Неправильный текст'})
+
+    class Meta:
+        model = Comment
+        exclude = ('is_published',)
+        widgets = {'post': forms.HiddenInput}
+        fields = ('content', 'author_id')
+
+    def save(self, request, obj, form):
+        if form.is_valid():
+            obj.author = request.user
+            obj.save()

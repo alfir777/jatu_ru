@@ -51,7 +51,13 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class CommentAdmin(admin.ModelAdmin):
-    prepopulated_fields = {'slug': ('post', 'author', 'created_at')}
+    form = PostAdminForm
+    readonly_fields = ('author', 'votes', 'created_at', 'updated_at')
+
+    def save_model(self, request, obj, form, change):
+        if form.is_valid():
+            obj.author = request.user
+            obj.save()
 
 
 admin.site.register(Post, PostAdmin)
