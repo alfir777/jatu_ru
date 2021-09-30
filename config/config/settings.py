@@ -33,13 +33,12 @@ DOMAIN_NAME = os.environ['DOMAIN_NAME']
 # SECURITY WARNING: don't run with debug turned on in production!
 if os.environ['DEBUG'] == 'True':
     DEBUG = True
-    ALLOWED_HOSTS = ['127.0.0.1']
 elif os.environ['DEBUG'] == 'False':
     DEBUG = False
-    ALLOWED_HOSTS = [os.environ['DOMAIN_NAME']]
 else:
     exit('DO cp ./.env_template.py ./.env and set DEBUG!')
 
+ALLOWED_HOSTS = list(os.environ['ALLOWED_HOSTS'].split(', '))
 
 # Application definition
 
@@ -107,8 +106,8 @@ elif os.environ['TYPE_DATABASES'] == 'postgresql':
             'NAME': os.environ['DATABASES_NAME'],
             'USER': os.environ['DATABASES_USER'],
             'PASSWORD': os.environ['DATABASES_PASSWORD'],
-            'HOST': '127.0.0.1',
-            'PORT': '5432',
+            'HOST': os.environ['DATABASES_HOST'],
+            'PORT': os.environ['DATABASES_PORT'],
         }
     }
 else:
