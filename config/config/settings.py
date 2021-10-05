@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.sites',
     'debug_toolbar',
-    'captcha',
     'ckeditor',
     'ckeditor_uploader',
     'blog.apps.BlogConfig',
