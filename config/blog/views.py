@@ -6,7 +6,8 @@ from django.core.mail import send_mail
 from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView
+from django.views.decorators.http import require_GET
+from django.views.generic import ListView, DetailView, TemplateView
 
 from config.settings import DOMAIN_NAME, EMAIL_SENDER, EMAIL_RECIPIEN
 from .forms import UserRegisterForm, UserLoginForm, ContactForm, BlogForm, UserCommentForm, GuestCommentForm
@@ -180,3 +181,8 @@ def contact(request):
 
 def test(request):
     return HttpResponse('<h1>TEST</h1>')
+
+
+class RobotsTxtView(TemplateView):
+    template_name = 'robots.txt'
+    content_type = 'text/plain'

@@ -1,0 +1,10 @@
+User-Agent: *
+Disallow: /admin/
+Disallow: /private/
+Disallow: /junk/
+Disallow: /search/
+Disallow: /latest/feed/
+
+Sitemap: https://jatu.ru/sitemap.xml
+
+Host: jatu.ru

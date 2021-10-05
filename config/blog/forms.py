@@ -14,6 +14,9 @@ class BlogForm(forms.Form):
                            label='Url (slug)',
                            widget=forms.TextInput(attrs={"class": "form-control"}),
                            )
+    description = forms.CharField(max_length=150,
+                                  label='Краткое описание',
+                                  widget=forms.TextInput(attrs={"class": "form-control"}))
     content = forms.CharField(label='Текст',
                               required=False,
                               widget=forms.Textarea(attrs={"class": "form-control", "rows": 10, }),
