@@ -14,10 +14,11 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-if os.path.isfile('.env'):
-    load_dotenv('.env')
-else:
-    exit('DO cp ./.env_template.py ./.env and set token!')
+if not os.environ['DEBUG']:
+    if os.path.isfile('../.env'):
+        load_dotenv('../.env')
+    else:
+        exit('DO cp ../.env_template.py ../.env and set token!')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -3,6 +3,7 @@
 /venv/
 /config/static/
 /migrations/
+/data/db/
 *.log
 .env
 db.sqlite3
