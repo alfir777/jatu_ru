@@ -14,7 +14,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-if not os.environ['DEBUG']:
+if 'DEBUG' not in os.environ:
     if os.path.isfile('../.env'):
         load_dotenv('../.env')
     else:
