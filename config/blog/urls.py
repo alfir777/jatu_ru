@@ -19,6 +19,7 @@ urlpatterns = [
     path('logout/', UserLogout.as_view(), name='user_logout'),
     path('portfolio/', portfolio, name='portfolio'),
     path('register/', register, name='register'),
+    path('restore_password/', restore_password, name='restore_password'),
     path('robots.txt', RobotsTxtView.as_view()),
     path('search/', Search.as_view(), name='search'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),

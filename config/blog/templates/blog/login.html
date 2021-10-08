@@ -18,6 +18,8 @@
                 {{ form.as_p }}
                 <button type="submit" class="btn btn-primary btn-block">Войти</button>
             </form>
+            <br>
+            <a href="{% url 'restore_password' %}" class="btn btn-primary btn-block" role="button">Забыли пароль?</a>
             {% endif %}
 
         </div>

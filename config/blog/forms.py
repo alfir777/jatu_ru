@@ -55,6 +55,10 @@ class UserRegisterForm(UserCreationForm):
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
 
 
+class RestorePasswordForm(forms.Form):
+    email = forms.EmailField(label='E-mail', widget=forms.EmailInput(attrs={"class": "form-control"}))
+
+
 class UserCommentForm(forms.Form):
     form = BlogForm
     content = forms.CharField(label='Текст', widget=forms.Textarea(attrs={"class": "form-control", "rows": 5}))

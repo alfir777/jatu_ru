@@ -6,11 +6,10 @@ from django.core.mail import send_mail
 from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.views.decorators.http import require_GET
 from django.views.generic import ListView, DetailView, TemplateView
 
 from config.settings import DOMAIN_NAME, EMAIL_SENDER, EMAIL_RECIPIEN
-from .forms import UserRegisterForm, UserLoginForm, ContactForm, BlogForm, UserCommentForm, GuestCommentForm
+from .forms import *
 from .models import Post, Category, Tag, Comment
 
 
@@ -122,6 +121,30 @@ def register(request):
     else:
         form = UserRegisterForm()
     return render(request, 'blog/register.html', {'form': form})
+
+
+def restore_password(request):
+    if request.method == 'POST':
+        form = RestorePasswordForm(request.POST)
+        if form.is_valid():
+            new_password = User.objects.make_random_password()
+            user_email = form.cleaned_data['email']
+            current_user = User.objects.filter(email=user_email).first()
+            if current_user:
+                current_user.set_password(new_password)
+                current_user.save()
+            send_mail(
+                subject='Восстановление пароля',
+                message=f'Новый пароль {new_password}',
+                from_email=EMAIL_SENDER,
+                recipient_list=[form.cleaned_data['email']],
+            )
+            return HttpResponse('Письмо с новым паролем было успешно отправлено')
+    restore_password_form = RestorePasswordForm()
+    context = {
+        'form': restore_password_form
+    }
+    return render(request, 'blog/restore_password.html', context=context)
 
 
 class UserLogin(SuccessMessageMixin, LoginView):
