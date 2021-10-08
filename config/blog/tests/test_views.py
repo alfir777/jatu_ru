@@ -4,8 +4,105 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
+from blog.models import Category, Post, Tag
+
 USER_EMAIL = 'test@company.com'
 OLD_PASSWORD = 'TestPassword1#'
+NUMBER_OF_ITEMS = 10
+
+
+class BlogTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        test_user = User.objects.create_user('user', password='password')
+        test_user.save()
+        test_category = Category.objects.create(title='Test', slug='Test')
+
+        for item_index in range(NUMBER_OF_ITEMS):
+            Post.objects.create(
+                title=f'title {item_index}',
+                slug=f'{item_index}',
+                description=f'description {item_index}',
+                author_id=test_user.id,
+                category_id=test_category.id,
+            )
+
+    def test_blog_url_exists_at_desired_location(self):
+        response = self.client.get('/blog/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_blog_uses_correct_template(self):
+        response = self.client.get(reverse('blog'))
+        self.assertTemplateUsed(response, 'blog/blog.html')
+
+    def test_post_list_view(self):
+        response = self.client.get(reverse('blog'))
+        self.assertContains(response, 'title 1')
+
+
+class PostByCategoryTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        test_user = User.objects.create_user('user', password='password')
+        test_user.save()
+        test_category = Category.objects.create(title='test_category', slug='test_category')
+
+        for item_index in range(NUMBER_OF_ITEMS):
+            Post.objects.create(
+                title=f'title {item_index}',
+                slug=f'{item_index}',
+                description=f'description {item_index}',
+                author_id=test_user.id,
+                category_id=test_category.id,
+            )
+
+    def test_post_by_category_url_exists_at_desired_location(self):
+        response = self.client.get('/blog/category/test_category')
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_by_category_uses_correct_template(self):
+        response = self.client.get('/blog/category/test_category')
+        self.assertTemplateUsed(response, 'blog/category.html')
+
+    def test_post_by_category_list_view(self):
+        response = self.client.get('/blog/category/test_category')
+        self.assertContains(response, 'title 1')
+
+
+class ContactTest(TestCase):
+
+    def test_contact_url_exists_at_desired_location(self):
+        response = self.client.get('/contact/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_contact_uses_correct_template(self):
+        response = self.client.get(reverse('contact'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'blog/contact.html')
+
+
+class PortfolioTest(TestCase):
+
+    def test_portfolio_url_exists_at_desired_location(self):
+        response = self.client.get('/portfolio/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_portfolio_uses_correct_template(self):
+        response = self.client.get(reverse('portfolio'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'blog/portfolio.html')
+
+
+class IndexTest(TestCase):
+
+    def test_index_url_exists_at_desired_location(self):
+        response = self.client.get('')
+        self.assertEqual(response.status_code, 200)
+
+    def test_index_uses_correct_template(self):
+        response = self.client.get(reverse('home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'blog/index.html')
 
 
 class RestorePasswordTest(TestCase):
