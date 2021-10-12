@@ -1,6 +1,8 @@
 from django.urls import path
 from django.contrib.sitemaps.views import sitemap
+from rest_framework import routers
 
+from .api import PostViewSet
 from .views import *
 from .sitemap import PostSitemap
 from .feeds import LatestPostsFeed
@@ -8,6 +10,8 @@ from .feeds import LatestPostsFeed
 sitemaps = {
     'posts': PostSitemap
 }
+router = routers.DefaultRouter()
+router.register('api/posts', PostViewSet)
 
 urlpatterns = [
     path('', index, name='home'),
@@ -28,3 +32,5 @@ urlpatterns = [
     path('blog/tag/<str:slug>', PostByTag.as_view(), name='tag'),
     path('post/<str:slug>', GetPost.as_view(), name='post'),
 ]
+
+urlpatterns += router.urls
