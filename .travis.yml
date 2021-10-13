@@ -2,8 +2,21 @@ language: python
 python:
   - "3.9"
 env:
-  - TYPE_DATABASES=sqlite3
-  - DEBUG=False
+  - SECRET_KEY = 'django-insecure-AA-AAAAAAAA=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+  - DOMAIN_NAME = 'DOMAIN_NAME'
+  - DEBUG = False
+  - EMAIL_HOST = 'EMAIL_HOST'
+  - EMAIL_HOST_USER = 'EMAIL_HOST_USER'
+  - EMAIL_HOST_PASSWORD = 'EMAIL_HOST_PASSWORD'
+  - EMAIL_SENDER = 'EMAIL_SENDER'
+  - EMAIL_RECIPIEN = 'EMAIL_RECIPIEN'
+  - TYPE_DATABASES = 'sqlite3'
+  - DATABASES_NAME = 'mydatabase'
+  - DATABASES_USER = 'mydatabaseuser'
+  - DATABASES_PASSWORD = 'mypassword'
+  - DATABASES_HOST = '127.0.0.1'
+  - DATABASES_PORT = '5432'
+  - ALLOWED_HOSTS = '127.0.0.1'
 install:
   - pip install -r requirements.txt
 script:
