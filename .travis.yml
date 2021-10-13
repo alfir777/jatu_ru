@@ -6,7 +6,7 @@ env:
 before_script:
   - pip install -r requirements.txt
   - cd ./config/
-  - python manage.py makemigrations
-  - python manage.py migrate
+services:
+  - postgresql
 script:
   - python manage.py test
