@@ -2,7 +2,7 @@ language: python
 python:
   - "3.9"
 env:
-  - TYPE_DATABASES=sqlite3
+  - DJANGO_SETTINGS_MODULE="config.settings"
 before_script:
   - pip install -r requirements.txt
   - cd ./config/
