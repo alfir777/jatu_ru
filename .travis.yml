@@ -6,5 +6,7 @@ env:
 before_script:
   - pip install -r requirements.txt
   - cd ./config/
+  - python manage.py makemigrations
+  - python manage.py migrate --run-syncdb
 script:
-  - python manage.py test
+  - python manage.py test --keepdb
