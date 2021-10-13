@@ -4,6 +4,6 @@ python:
 install:
   - pip install -r requirements.txt
 before_script:
-  - rm db.sqlite3
+  - python ./config/manage.py migrate --run-syncdb
 script:
   - python ./config/manage.py test blog
