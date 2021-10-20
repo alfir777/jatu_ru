@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
     'django.contrib.sites',
-    ('debug_toolbar' if os.environ['DEBUG'] == 'True' else None),
+    'debug_toolbar',
     'ckeditor',
     'ckeditor_uploader',
     'rest_framework',
@@ -69,7 +69,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    ('debug_toolbar.middleware.DebugToolbarMiddleware' if os.environ['DEBUG'] == 'True' else None),
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
