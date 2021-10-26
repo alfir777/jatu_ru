@@ -21,7 +21,7 @@ class Blog(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = DOMAIN_NAME
+        context['title'] = f'Блог | {DOMAIN_NAME}'
         return context
 
 
@@ -36,7 +36,7 @@ class PostByCategory(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = str(Category.objects.get(slug=self.kwargs['slug']))
+        context['title'] = f'{str(Category.objects.get(slug=self.kwargs["slug"]))} | {DOMAIN_NAME}'
         return context
 
 
@@ -51,7 +51,7 @@ class PostByTag(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = Tag.objects.get(slug=self.kwargs['slug'])
+        context['title'] = f'{Tag.objects.get(slug=self.kwargs["slug"])} | {DOMAIN_NAME}'
         return context
 
 
@@ -74,6 +74,8 @@ class GetPost(DetailView):
         for comment in comment_list:
             comment._post_url = self.object.get_absolute_url()
         context['form'] = UserCommentForm(initial={'post': self.object.slug})
+        context['description'] = self.object.description
+        context['title'] = f'{DOMAIN_NAME} | {self.object.title}'
         return context
 
     def post(self, request, *args, **kwargs):
@@ -105,6 +107,7 @@ class Search(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['s'] = f"s={self.request.GET.get('s')}&"
+        context['title'] = f'{DOMAIN_NAME} | Поиск'
         return context
 
 
@@ -120,7 +123,11 @@ def register(request):
             messages.error(request, 'Ошибка регистрации')
     else:
         form = UserRegisterForm()
-    return render(request, 'blog/register.html', {'form': form})
+    context = {
+        'form': form,
+        'title': f'Регистрация | {DOMAIN_NAME}',
+    }
+    return render(request, 'blog/register.html', context=context)
 
 
 def restore_password(request):
@@ -142,7 +149,8 @@ def restore_password(request):
             return HttpResponse('Письмо с новым паролем было успешно отправлено')
     restore_password_form = RestorePasswordForm()
     context = {
-        'form': restore_password_form
+        'form': restore_password_form,
+        'title': f'{DOMAIN_NAME} | Восстановление пароля',
     }
     return render(request, 'blog/restore_password.html', context=context)
 
@@ -156,6 +164,11 @@ class UserLogin(SuccessMessageMixin, LoginView):
 
     def get_success_message(self, cleaned_data):
         return self.success_messages
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Авторизация | {DOMAIN_NAME}'
+        return context
 
 
 class UserLogout(LogoutView):
@@ -171,15 +184,25 @@ def blog_add_post(request):
             return redirect(post)
     else:
         form = BlogForm()
-    return render(request, 'blog/blog_add_post.html', {'form': form})
+    context = {
+        'form': form,
+        'title': f'{DOMAIN_NAME} | Добавление поста',
+    }
+    return render(request, 'blog/blog_add_post.html', context=context)
 
 
 def index(request):
-    return render(request, 'blog/index.html')
+    context = {
+        'title': DOMAIN_NAME
+    }
+    return render(request, 'blog/index.html', context=context)
 
 
 def portfolio(request):
-    return render(request, 'blog/portfolio.html')
+    context = {
+        'title': DOMAIN_NAME
+    }
+    return render(request, 'blog/portfolio.html', context=context)
 
 
 def contact(request):
@@ -199,7 +222,11 @@ def contact(request):
                 messages.error(request, 'Ошибка отправки письма')
     else:
         form = ContactForm()
-    return render(request, 'blog/contact.html', {'form': form})
+    context = {
+        'form': form,
+        'title': f'{DOMAIN_NAME} | Контакты',
+    }
+    return render(request, 'blog/contact.html', context=context)
 
 
 def test(request):

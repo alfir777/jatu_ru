@@ -54,8 +54,8 @@ class Tag(models.Model):
 
 
 class Post(models.Model):
-    title = models.CharField(max_length=255, verbose_name='Заголовок')
-    description = models.TextField(verbose_name='Описание', default='')
+    title = models.CharField(max_length=100, verbose_name='Заголовок')
+    description = models.TextField(max_length=100, verbose_name='Описание', default='')
     slug = models.SlugField(max_length=255, verbose_name='Url', unique=True)
     author = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='posts')
     content = models.TextField(blank=True)

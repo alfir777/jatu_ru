@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %} {{ title }} | {{ block.super }} {% endblock %}
+{% block description %} {{ title }} {% endblock %}
+{% block title %} {{ title }} {% endblock %}
 
 {% block content %}
 <div class="row mar-bot40">
@@ -36,7 +37,7 @@
                         {% endif %}
                     </div>
                     <p>
-                        {{ post.content|safe|linebreaks|truncatewords:50 }}
+                        {{ post.description|safe|linebreaks }}
                     </p>
                     <div class="bottom-article">
                         <ul class="meta-post">

@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}
-{{ category.title }} :: {{ block.super }}
-{% endblock %}
+{% block description %} {{ category.title }} |{{ title }} {% endblock %}
+{% block title %} {{ title }} {% endblock %}
 
 {% load static %}
 {% block content %}

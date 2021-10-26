@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block title %} {{ title }} | {{ block.super }} {% endblock %}
 {% block content %}
 <div class="slider">
     <img src="{% static 'img/bg-main1.jpg' %}" alt="" class="img-responsive"/>
