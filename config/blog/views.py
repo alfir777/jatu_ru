@@ -21,7 +21,7 @@ class Blog(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'Блог | {DOMAIN_NAME}'
+        context['title'] = f'{DOMAIN_NAME} | Блог'
         return context
 
 
@@ -36,7 +36,7 @@ class PostByCategory(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'{str(Category.objects.get(slug=self.kwargs["slug"]))} | {DOMAIN_NAME}'
+        context['title'] = f'{DOMAIN_NAME} | {str(Category.objects.get(slug=self.kwargs["slug"]))}'
         return context
 
 
@@ -51,7 +51,7 @@ class PostByTag(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'{Tag.objects.get(slug=self.kwargs["slug"])} | {DOMAIN_NAME}'
+        context['title'] = f'{DOMAIN_NAME} | {Tag.objects.get(slug=self.kwargs["slug"])}'
         return context
 
 
@@ -65,13 +65,13 @@ class GetPost(DetailView):
         self.object.views = F('views') + 1
         self.object.save()
         self.object.refresh_from_db()
-        comment_list = (
+        comments = (
             Comment.objects.filter(post=self.object).order_by('created_at')
         )
         comment_count = Comment.objects.filter(post=self.object).order_by('created_at').count()
         context['comment_count'] = comment_count
-        context['comments'] = comment_list
-        for comment in comment_list:
+        context['comments'] = comments
+        for comment in comments:
             comment._post_url = self.object.get_absolute_url()
         context['form'] = UserCommentForm(initial={'post': self.object.slug})
         context['description'] = self.object.description
@@ -125,7 +125,7 @@ def register(request):
         form = UserRegisterForm()
     context = {
         'form': form,
-        'title': f'Регистрация | {DOMAIN_NAME}',
+        'title': f'{DOMAIN_NAME} | Регистрация',
     }
     return render(request, 'blog/register.html', context=context)
 
@@ -167,7 +167,7 @@ class UserLogin(SuccessMessageMixin, LoginView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'Авторизация | {DOMAIN_NAME}'
+        context['title'] = f'{DOMAIN_NAME} | Авторизация'
         return context
 
 
@@ -193,14 +193,14 @@ def blog_add_post(request):
 
 def index(request):
     context = {
-        'title': DOMAIN_NAME
+        'title': f'{DOMAIN_NAME} | Добро пожаловать'
     }
     return render(request, 'blog/index.html', context=context)
 
 
 def portfolio(request):
     context = {
-        'title': DOMAIN_NAME
+        'title': f'{DOMAIN_NAME} | Портфолио'
     }
     return render(request, 'blog/portfolio.html', context=context)
 
