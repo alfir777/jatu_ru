@@ -21,7 +21,14 @@ post, author, body, created_at, updated_at, votes, is_published
 """
 
 
-class Category(models.Model):
+class BaseModel(models.Model):
+    objects = models.Manager()
+
+    class Meta:
+        abstract = True
+
+
+class Category(BaseModel):
     title = models.CharField(max_length=255, db_index=True, verbose_name='Название категории')
     slug = models.SlugField(max_length=255, verbose_name='Url', unique=True)
 
@@ -37,7 +44,7 @@ class Category(models.Model):
         ordering = ['title']
 
 
-class Tag(models.Model):
+class Tag(BaseModel):
     title = models.CharField(max_length=50, db_index=True, verbose_name='Название тега')
     slug = models.SlugField(max_length=50, verbose_name='Url', unique=True)
 
@@ -53,7 +60,7 @@ class Tag(models.Model):
         ordering = ['title']
 
 
-class Post(models.Model):
+class Post(BaseModel):
     title = models.CharField(max_length=100, verbose_name='Заголовок')
     description = models.TextField(max_length=100, verbose_name='Описание', default='')
     slug = models.SlugField(max_length=255, verbose_name='Url', unique=True)
@@ -80,7 +87,7 @@ class Post(models.Model):
         ordering = ['-created_at']
 
 
-class Comment(models.Model):
+class Comment(BaseModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='comments')
     content = models.TextField(blank=False)
