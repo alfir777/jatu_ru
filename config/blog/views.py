@@ -22,6 +22,7 @@ class Blog(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = f'{DOMAIN_NAME} | Блог'
+        context['logo_name'] = DOMAIN_NAME
         return context
 
 
@@ -37,6 +38,7 @@ class PostByCategory(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = f'{DOMAIN_NAME} | {str(Category.objects.get(slug=self.kwargs["slug"]))}'
+        context['logo_name'] = DOMAIN_NAME
         return context
 
 
@@ -52,6 +54,7 @@ class PostByTag(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = f'{DOMAIN_NAME} | {Tag.objects.get(slug=self.kwargs["slug"])}'
+        context['logo_name'] = DOMAIN_NAME
         return context
 
 
@@ -76,6 +79,7 @@ class GetPost(DetailView):
         context['form'] = UserCommentForm(initial={'post': self.object.slug})
         context['description'] = self.object.description
         context['title'] = f'{DOMAIN_NAME} | {self.object.title}'
+        context['logo_name'] = DOMAIN_NAME
         return context
 
     def post(self, request, *args, **kwargs):
@@ -108,6 +112,7 @@ class Search(ListView):
         context = super().get_context_data(**kwargs)
         context['s'] = f"s={self.request.GET.get('s')}&"
         context['title'] = f'{DOMAIN_NAME} | Поиск'
+        context['logo_name'] = DOMAIN_NAME
         return context
 
 
@@ -126,6 +131,7 @@ def register(request):
     context = {
         'form': form,
         'title': f'{DOMAIN_NAME} | Регистрация',
+        'logo_name': DOMAIN_NAME,
     }
     return render(request, 'blog/register.html', context=context)
 
@@ -151,6 +157,7 @@ def restore_password(request):
     context = {
         'form': restore_password_form,
         'title': f'{DOMAIN_NAME} | Восстановление пароля',
+        'logo_name': DOMAIN_NAME,
     }
     return render(request, 'blog/restore_password.html', context=context)
 
@@ -168,6 +175,7 @@ class UserLogin(SuccessMessageMixin, LoginView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = f'{DOMAIN_NAME} | Авторизация'
+        context['logo_name'] = DOMAIN_NAME
         return context
 
 
@@ -187,22 +195,34 @@ def blog_add_post(request):
     context = {
         'form': form,
         'title': f'{DOMAIN_NAME} | Добавление поста',
+        'logo_name': DOMAIN_NAME,
     }
     return render(request, 'blog/blog_add_post.html', context=context)
 
 
 def index(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            mail = send_mail(form.cleaned_data['subject'],
+                             form.cleaned_data['content'],
+                             EMAIL_SENDER,
+                             [EMAIL_RECIPIEN],
+                             fail_silently=True
+                             )
+            if mail:
+                messages.success(request, 'Письмо отправлено')
+                return redirect('contact')
+            else:
+                messages.error(request, 'Ошибка отправки письма')
+    else:
+        form = ContactForm()
     context = {
-        'title': f'{DOMAIN_NAME} | Добро пожаловать'
+        'title': f'{DOMAIN_NAME} | Добро пожаловать',
+        'form': form,
+        'logo_name': DOMAIN_NAME,
     }
     return render(request, 'blog/index.html', context=context)
-
-
-def portfolio(request):
-    context = {
-        'title': f'{DOMAIN_NAME} | Портфолио'
-    }
-    return render(request, 'blog/portfolio.html', context=context)
 
 
 def contact(request):
@@ -225,6 +245,7 @@ def contact(request):
     context = {
         'form': form,
         'title': f'{DOMAIN_NAME} | Контакты',
+        'logo_name': DOMAIN_NAME,
     }
     return render(request, 'blog/contact.html', context=context)
 

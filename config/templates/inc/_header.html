@@ -1,18 +1,15 @@
 {% load static %}
 {% load menu %}
-<header>
-    <div class="main-menu">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h1><a class="navbar-brand" href="{% url 'home' %}" data-0="line-height:90px;"
-                           data-300="line-height:50px;"> JaTu.RU
-                    </a></h1>
-                </div>
-                <div class="col-md-8">
-                    {% include 'inc/_nav.html' %}
-                </div>
-            </div>
-        </div>
+<!-- ======= Header ======= -->
+<header id="header"
+        class="fixed-top header-inner-pages">
+    <div class="container d-flex align-items-center justify-content-between">
+
+        <h1 class="logo"><a href="index.html">{{ logo_name }}</a></h1>
+        <!-- Uncomment below if you prefer to use an image logo -->
+        <!-- <a href="index.html" class="logo"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+
+        {% include 'inc/_nav.html' %}
+
     </div>
-</header>
+</header><!-- End Header -->

@@ -5,27 +5,34 @@
 {% block title %} {{ title }} {% endblock %}
 
 {% block content %}
-<hr>
-<div class="container">
-    <div class="row">
-        <div class="col-lg-4">
+<main id="main">
 
-            <h2>Авторизация</h2>
-            {% if user.is_authenticated %}
-            <p>Вы уже выполнили вход</p>
-            {% else %}
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary btn-block">Войти</button>
-            </form>
-            <br>
-            <a href="{% url 'restore_password' %}" class="btn btn-primary btn-block" role="button">Забыли пароль?</a>
-            {% endif %}
+    {% include 'inc/_breadcrumb.html' %}
 
+    <section class="inner-page">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-lg-4">
+                    <div class="row">
+                        <h2>Авторизация</h2>
+                        {% if user.is_authenticated %}
+                        <p>Вы уже выполнили вход</p>
+                        {% else %}
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit"
+                                    class="btn btn-primary btn-block">Войти
+                            </button>
+                        </form>
+                        <a href="{% url 'restore_password' %}">Забыли пароль?</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-<hr>
+    </section>
+
+</main><!-- End #main -->
 
 {% endblock content %}

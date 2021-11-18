@@ -1,29 +1,55 @@
 {% load static %}
-<div class="dropdown">
-    <ul class="nav nav-pills">
+<nav id="navbar" class="navbar">
+    <ul>
         {% url 'home' as home_url %}
-        <li {% if request.get_full_path == home_url %}class="active" {% endif %}>
-            <a href="{{ home_url }}">Главная</a></li>
-        {% url 'portfolio' as portfolio_url %}
-        <li {% if request.get_full_path == portfolio_url %}class="active" {% endif %}>
-            <a href="{{ portfolio_url }}">Портфолио</a></li>
+        <li><a class="nav-link scrollto {% if request.get_full_path == home_url %}active {% endif %}" href="{{ home_url }}#hero">Главная</a></li>
+
+        <li><a class="nav-link scrollto" href="{{ home_url }}#about">About</a></li>
+        <li><a class="nav-link scrollto" href="{{ home_url }}#services">Services</a></li>
+
+        <li><a class="nav-link  scrollto" href="{{ home_url }}#portfolio">Портфолио</a></li>
+
+        <li><a class="nav-link scrollto" href="{{ home_url }}#team">Team</a></li>
+
+        <li><a class="nav-link scrollto" href="#contact">Контакты</a></li>
+
         {% url 'blog' as blog_url %}
-        <li {% if blog_url in request.get_full_path %}class="active" {% endif %}>
-            <a href="{{ blog_url }}">Блог</a></li>
-        {% url 'contact' as contact_url %}
-        <li {% if request.get_full_path == contact_url %}class="active" {% endif %}>
-            <a href="{{ contact_url }}">Контакты</a></li>
+        <li class="dropdown">
+            <a
+                    {% if blog_url in request.get_full_path %}
+                    class='nav-link scrollto active'
+                    {% endif %}
+                    href="{{ blog_url }}">
+                <span>Блог</span>
+                <i class="bi bi-chevron-down"></i>
+            </a>
+            <ul>
+              <li><a href="#">Drop Down 1</a></li>
+              <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-right"></i></a>
+                <ul>
+                  <li><a href="#">Deep Drop Down 1</a></li>
+                  <li><a href="#">Deep Drop Down 2</a></li>
+                </ul>
+              </li>
+              <li><a href="#">Drop Down 2</a></li>
+            </ul>
+          </li>
+
         {% if not request.user.is_authenticated %}
         {% url 'register' as register_url %}
-        <li {% if request.get_full_path == register_url %}class="active" {% endif %}>
-            <a href="{{ register_url }}">Регистрация</a></li>
+        <li>
+            <a {% if request.get_full_path == register_url %} class='nav-link scrollto active' {% endif %} href="{{ register_url }}">Регистрация</a>
+        </li>
         {% url 'user_login' as user_login_url %}
-        <li {% if request.get_full_path == login_url %}class="active" {% endif %}>
-            <a href="{{ user_login_url }}">Вход</a></li>
+        <li>
+            <a {% if request.get_full_path == login_url %} class='nav-link scrollto active' {% endif %} href="{{ user_login_url }}">Вход</a>
+        </li>
         {% else %}
         {% url 'user_logout' as user_logout_url %}
-        <li {% if request.get_full_path == user_logout_url %}class="active" {% endif %}>
-            <a href="{{ user_logout_url }}">Выход</a></li>
+        <li>
+            <a {% if request.get_full_path == user_logout_url %} class='nav-link scrollto active' {% endif %} href="{{ user_logout_url }}">Выход</a>
+        </li>
         {% endif %}
     </ul>
-</div>
+    <i class="bi bi-list mobile-nav-toggle"></i>
+</nav><!-- .navbar -->
