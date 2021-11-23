@@ -1,21 +1,23 @@
-<div class="widget">
-    <h5 class="widgetheading">Популярные посты</h5>
-    <ul class="recent">
+<div class="single-blog-page">
+    <div class="left-blog">
+        <h4>Популярные посты</h4>
         {% for post in posts %}
-        <li>
-            {% if post.photo %}
-            <span class="border-10"><img src="{{ post.photo.url }}" class="pull-left" width="75" style="margin-right:5%" alt=""/></span>
-            {% else %}
-            <img src="https://picsum.photos/id/1060/536/354/?blur=2" class="pull-left" width="75" style="margin-right:5%" alt=""/>
-            {% endif %}
-        </li>
-        <li>
-            <h6><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h6>
-            <p>
-                {{ post.content|safe|linebreaks|truncatewords:5 }}
-            </p>
-        </li>
+        <div class="recent-single-post">
+            <div class="post-img">
+                <a href="{{ post.get_absolute_url }}">
+                    {% if post.photo %}
+                    <img src="{{ post.photo.url }}"
+                         alt="">
+                    {% else %}
+                    <img src="https://picsum.photos/id/1060/536/354/?blur=2"
+                         alt="">
+                    {% endif %}
+                </a>
+            </div>
+            <div class="pst-content">
+                <p><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></p>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
 </div>
-    

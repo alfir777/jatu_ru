@@ -1,8 +1,12 @@
-<div class="widget">
-    <h5 class="widgetheading">Облако тегов</h5>
-    <ul class="tags">
-        {% for tag in tags %}
-        <li><a href="{{ tag.get_absolute_url }}">{{ tag.title }}</a></li>
-        {% endfor %}
-    </ul>
+<div class="single-blog-page">
+    <div class="left-tags blog-tags">
+        <div class="popular-tag left-side-tags left-blog">
+            <h4>Облако тегов</h4>
+            <ul>
+                {% for tag in tags %}
+                <li><a href="{{ tag.get_absolute_url }}">{{ tag.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </div>

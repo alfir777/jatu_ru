@@ -2,13 +2,14 @@
 {% load menu %}
 <!-- ======= Header ======= -->
 <header id="header"
-        class="fixed-top header-inner-pages">
-    <div class="container d-flex align-items-center justify-content-between">
+        class="fixed-top d-flex align-items-center">
+    <div class="container d-flex justify-content-between">
+        <div class="logo">
 
-        <h1 class="logo"><a href="index.html">{{ logo_name }}</a></h1>
-        <!-- Uncomment below if you prefer to use an image logo -->
-        <!-- <a href="index.html" class="logo"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
-
+            <h1 class="logo"><a href="{{ home_url }}">{{ logo_name }}</a></h1>
+            <!-- Uncomment below if you prefer to use an image logo -->
+            <!-- <a href="index.html" class="logo"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+        </div>
         {% include 'inc/_nav.html' %}
 
     </div>

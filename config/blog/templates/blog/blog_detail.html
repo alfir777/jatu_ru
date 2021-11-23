@@ -5,81 +5,186 @@
 {% block title %} {{ title }} {% endblock %}
 
 {% block content %}
-<section id="content">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8">
-                <article>
-                    <div class="post-image">
-                        <div class="post-heading">
-                            <h3>{{ post.title }}</h3>
-                        </div>
-
-                        <div class="bottom-article">
-                            <ul class="meta-post">
-                                <li><i class="icon-calendar"></i><a href="#">{{ post.created_at|date:"Y-m-d H:i:s" }}</a>
-                                </li>
-                                <li><i class="icon-user"></i><a href="#">{{ post.author }}</a></li>
-                                <li><i class="icon-folder-open"></i><a href="#">{{ post.category }}</a></li>
-                            </ul>
-                        </div>
-
-                        {% if post.photo %}
-                        <img src="{{ post.photo.url }}" style="width:100%"  alt=""/>
-                        {% else %}
-                        <img src="https://picsum.photos/id/1060/536/354/?blur=2" style="width:100%" alt=""/>
-                        {% endif %}
-                    </div>
-                    <p>
-                        {{ post.content|safe }}
-                    </p>
-                    <div class="bottom-article">
-                        <ul class="meta-post">
-                            <li><i class="icon-calendar"></i><a href="#">{{ post.created_at|date:"Y-m-d H:i:s" }}</a>
-                            </li>
-                            <li><i class="icon-user"></i><a href="#">{{ post.author }}</a></li>
-                            <li><i class="icon-folder-open"></i><a href="{{ post.category.get_absolute_url }}">{{ post.category }}</a></li>
-                            <li><i class="icon-folder-open"></i><a href="#">{{ post.views }}</a></li>
-                            <li><i class="icon-comments"></i><a href="#">{{comment_count}} комментарий</a></li>
-                        </ul>
-                    </div>
-                    <div class="bottom-article">
-                        <ul class="meta-post">
-                            {% if post.tags.exists %}
-                            <li><i class="icon-calendar"></i><a href="#">Tags: </a></li>
-                                {% for tag in post.tags.all %}
-                                <li><i class="icon-calendar"></i><a href="{{ tag.get_absolute_url }}">{{ tag.title }}</a></li>
-                                {% endfor %}
-                            {% endif %}
-                        </ul>
-                    </div>
-                    <h4 class="mt-5">HoBый комментарий</h4>
-                    <form action="" method="post">
-                        {% csrf_token %}
-
-                        {{ form.as_p }}
-                        <button type="submit" class="btn btn-primary btn-block">Добавить комментарий</button>
-                    </form>
-                    {% if comments %}
-                        <div class="mt-5">
-                            {% for comment in comments %}
-                            <div class="my-2 p-2 border">
-                                <h5><b>{{ comment.author }}</b></h5>
-                                <p>{{ comment.content|safe }}</p>
-                                <p class="text-right font-italic">{{ comment.created_at }}</p>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </article>
-
-            </div>
-            <div class="col-lg-4">
-
+<main id="main">
+    {% include 'inc/_header_blog.html' %}
+    <div class="blog-page area-padding">
+        <div class="container">
+            <div class="row">
+                <!-- Start left sidebar -->
                 {% include 'inc/_sidebar.html' %}
+                <!-- End left sidebar -->
 
+                <!-- Start single blog -->
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                    <div class="row">
+                        <article class="blog-post-wrapper">
+                            <div class="post-image">
+                                {% if post.photo %}
+                                <img src="{{ post.photo.url }}"
+                                     alt="">
+                                {% else %}
+                                <img src="{% static '/img/plug.jpg' %}"
+                                     width="85%"
+                                     alt="">
+                                {% endif %}
+                            </div>
+                            <div class="post-information">
+                                <h2>{{ post.title }}</h2>
+
+                                <div class="entry-meta">
+                                    <span class="author-meta"><i class="bi bi-person"></i> <a href="#">{{ post.author }}</a></span>
+                                    <span><i class="bi bi-clock"></i>{{ post.created_at|date:"Y-m-d H:i:s" }}</span>
+                                    <span class="tag-meta"><i class="bi bi-pin"></i> <a href="{{ post.category.get_absolute_url }}">{{ post.category }}</a></span>
+                                    <span class="tag-meta">
+                                        <i class="bi bi-folder"></i>
+                                        {% if post.tags.exists %}
+                                            {% for tag in post.tags.all %}
+                                            <a href="{{ tag.get_absolute_url }}">{{ tag.title }}</a>
+                                            {% endfor %}
+                                        {% else %}
+                                            Нет тегов
+                                        {% endif %}
+                                    </span>
+                                    <span class="tag-meta"><i class="bi bi-tags"></i> <a href="#">Нет меток</a></span>
+                                    <span class="tag-meta"><i class="bi bi-eye"></i><a href="#">{{ post.views }}</a></span>
+                                    <span class="tag-meta"><i class="bi bi-chat-left-dots"></i><a href="#">{{comment_count}}</a></span>
+                                </div>
+
+                                <div class="entry-content">
+                                    {{ post.content|safe }}
+                                </div>
+                            </div>
+                        </article>
+                        <div class="clear"></div>
+
+                        <div class="single-post-comments">
+                            <div class="comments-heading">
+                                <h3>{{comment_count}} comments</h3>
+                            </div>
+                            {% if comments %}
+                            <div class="comments-list">
+                                <ul>
+                                    {% for comment in comments %}
+                                    <li>
+                                        <div class="comments-details">
+                                            <div class="comments-list-img">
+                                                <img src="{% static '/img/blog/b02.jpg' %}"
+                                                     alt="post-author">
+                                            </div>
+                                            <div class="comments-content-wrap">
+                                                <span>
+                                                    <b><a href="#">{{ comment.author }}</a></b>
+                                                    <span class="post-time">{{ comment.created_at }}</span>
+                                                    <a href="#">Reply</a>
+                                                </span>
+                                                <p>{{ comment.content|safe }}</p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                            <div class="comment-respond">
+                                <h3 class="comment-reply-title">HoBый комментарий</h3>
+                                <form action=""
+                                      method="post">
+                                    {% csrf_token %}
+
+                                    {{ form.as_p }}
+                                    <input type="submit"
+                                           value="Добавить комментарий"/>
+                                    <!--                                <button type="submit"-->
+                                    <!--                                        class="btn btn-primary btn-block">Добавить комментарий-->
+                                    <!--                                </button>-->
+                                </form>
+                            </div>
+
+                            <div class="comments-area">
+                                <div class="comments-heading">
+                                    <h3></h3>
+                                    <h3>3 comments</h3>
+                                </div>
+                                <div class="comments-list">
+                                    <ul>
+                                        <li>
+                                            <div class="comments-details">
+                                                <div class="comments-list-img">
+                                                    <img src="{% static '/img/blog/b02.jpg' %}"
+                                                         alt="post-author">
+                                                </div>
+                                                <div class="comments-content-wrap">
+                                                    <span>
+                                                        <b><a href="#">admin</a></b>
+                                                        Post author
+                                                        <span class="post-time">October 6, 2014 at 6:18 pm </span>
+                                                        <a href="#">Reply</a>
+                                                    </span>
+                                                    <p>Quisque orci nibh, porta vitae sagittis sit amet, vehicula vel
+                                                        mauris. Aenean at justo dolor. Fusce ac sapien bibendum,
+                                                        scelerisque libero nec</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="threaded-comments">
+                                            <div class="comments-details">
+                                                <div class="comments-list-img">
+                                                    <img src="{% static '/img/blog/b02.jpg' %}"
+                                                         alt="post-author">
+                                                </div>
+                                                <div class="comments-content-wrap">
+                                                    <span>
+                                                        <b><a href="#">demo</a></b>
+                                                        Post author
+                                                        <span class="post-time">October 6, 2014 at 7:25 pm</span>
+                                                        <a href="#">Reply</a>
+                                                      </span>
+                                                    <p>Quisque semper nunc vitae erat pellentesque, ac placerat arcu
+                                                        consectetur</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="comment-respond">
+                                <h3 class="comment-reply-title">Leave a Reply </h3>
+                                <span class="email-notes">Your email address will not be published. Required fields are marked *</span>
+                                <form action="#">
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4">
+                                            <p>Name *</p>
+                                            <input type="text"/>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4">
+                                            <p>Email *</p>
+                                            <input type="email"/>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4">
+                                            <p>Website</p>
+                                            <input type="text"/>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 comment-form-comment">
+                                            <p>Website</p>
+                                            <textarea id="message-box"
+                                                      cols="30"
+                                                      rows="10"></textarea>
+                                            <input type="submit"
+                                                   value="Post Comment"/>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- single-blog end -->
+
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</section>
+</main>
+
 {% endblock content %}

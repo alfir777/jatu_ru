@@ -5,87 +5,67 @@
 {% block title %} {{ title }} {% endblock %}
 
 {% block content %}
-<div class="row mar-bot40">
-    <div class="col-md-offset-3 col-md-6">
-        <div class="sections-header">
-            <h2></h2>
-        </div>
-    </div>
-</div>
-<section id="content">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8">
-                {% for post in posts %}
-                <article>
-                    <div class="post-image">
-                        <div class="post-heading">
-                            <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
-                        </div>
-                        <div class="bottom-article">
-                            <ul class="meta-post">
-                                <li><i class="icon-calendar"></i><a href="#">{{ post.created_at|date:"Y-m-d H:i:s" }}</a>
-                                </li>
-                                <li><i class="icon-user"></i><a href="#">{{ post.author }}</a></li>
-                                <li><i class="icon-folder-open"></i><a href="#">{{ post.category }}</a></li>
-                            </ul>
-                        </div>
-                        {% if post.photo %}
-                        <img src="{{ post.photo.url }}" alt=""/>
-                        {% else %}
-                        <img src="https://picsum.photos/id/1060/536/354/?blur=2" alt=""/>
-                        {% endif %}
-                    </div>
-                    <p>
-                        {{ post.content|safe|linebreaks|truncatewords:50 }}
-                    </p>
-                    <div class="bottom-article">
-                        <ul class="meta-post">
-                            <li><i class="icon-calendar"></i><a href="#">{{ post.created_at|date:"Y-m-d H:i:s" }}</a>
-                            </li>
-                            <li><i class="icon-user"></i><a href="#">{{ post.author }}</a></li>
-                            <li><i class="icon-folder-open"></i><a href="#">{{ post.category }}</a></li>
-                            <li><i class="icon-comments"></i><a href="#">4 Comments</a></li>
-                        </ul>
-                        <a href="{{ post.get_absolute_url }}" class="pull-right">Подробнее.. <i
-                                class="icon-angle-right"></i></a>
-                    </div>
-                </article>
+<main id="main">
 
-                {% empty %}
-                <p>По Вашему запросу ничего не найдено..</p>
-                {% endfor %}
+    {% include 'inc/_header_blog.html' %}
 
-                {% if page_obj.has_other_pages %}
-                <div id="pagination">
-                    <span class="all">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
-
-                    {% if page_obj.has_previous %}
-                    <a class="inactive" href="?{{ s }}page={{ page_obj.previous_page_number }}" tabindex="-1">Предыдущий</a>
-                    {% endif %}
-
-                    {% for p in page_obj.paginator.page_range %}
-                    {% if page_obj.number == p %}
-                    <span class="current">{{ p }}</span>
-                    {% elif p > page_obj.number|add:-3 and p < page_obj.number|add:3 %}
-                    <a href="?{{ s }}page={{ p }}" class="inactive">{{ p }}</a>
-                    {% endif %}
-                    {% endfor %}
-
-                    {% if page_obj.has_next %}
-                    <a class="inactive" href="?{{ s }}page={{ page_obj.next_page_number }}">Далее</a>
-                    {% endif %}
-
-                </div>
-                {% endif %}
-
-            </div>
-            <div class="col-lg-4">
-
+    <div class="blog-page area-padding">
+        <div class="container">
+            <div class="row">
+                <!-- Start left sidebar -->
                 {% include 'inc/_sidebar.html' %}
+                <!-- End left sidebar -->
 
+                <!-- Start single blog -->
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                    <div class="row">
+                        {% for post in posts %}
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="single-blog">
+                                <div class="single-blog-img">
+                                    <a href="{{ post.get_absolute_url }}">
+                                        {% if post.photo %}
+                                        <img src="{{ post.photo.url }}"
+                                             alt="">
+                                        {% else %}
+                                        <img src="{% static '/img/plug.jpg' %}"
+                                             width="85%"
+                                             alt="">
+                                        {% endif %}
+                                    </a>
+                                </div>
+                                <div class="blog-meta">
+                                    <span class="comments-type">
+                                        <i class="bi bi-chat"></i>
+                                        <a href="{{ post.get_absolute_url }}">{{comment_count}} comments</a>
+                                    </span>
+                                    <span class="date-type">
+                                        <i class="bi bi-calendar"></i>{{ post.created_at|date:"Y-m-d H:i:s" }}
+                                    </span>
+                                </div>
+                                <div class="blog-text">
+                                    <h4>
+                                        <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                                    </h4>
+                                    <p>
+                                        {{ post.description|safe|linebreaks }}
+                                    </p>
+                                </div>
+                                <span>
+                                    <a href="{{ post.get_absolute_url }}"
+                                       class="ready-btn">Подробнее..</a>
+                                </span>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>По Вашему запросу ничего не найдено..</p>
+                        {% endfor %}
+
+                        {% include 'inc/_pagination.html' %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</section>
+</main>
 {% endblock content %}
