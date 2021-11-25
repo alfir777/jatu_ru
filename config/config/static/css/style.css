@@ -681,7 +681,7 @@ div#preloader {
 }
 
 .team-member::before {
-  background: rgba(0, 0, 0, 0) url("../img/team/team01.jpg") repeat scroll 0 0;
+  background: rgba(0, 0, 0, 0) url("../img/team/1.jpg") repeat scroll 0 0;
   content: "";
   display: block;
   height: 100%;
