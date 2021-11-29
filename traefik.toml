@@ -1,0 +1,32 @@
+# listen on port 80
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+    [entryPoints.web.http.redirections.entryPoint]
+      to = "websecure"
+      scheme = "https"
+
+  [entryPoints.websecure]
+    address = ":443"
+
+
+# Traefik dashboard over http
+[api]
+  dashboard = true
+
+[log]
+  level = "ERROR"
+
+[accessLog]
+
+[certificatesResolvers.lets-encrypt.acme]
+  email = "admin@jatu.ru"
+  storage = "acme.json"
+  [certificatesResolvers.lets-encrypt.acme.tlsChallenge]
+
+[providers.docker]
+  watch = true
+  network = "web"
+
+[providers.file]
+  filename = "traefik_dynamic.toml"
