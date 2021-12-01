@@ -4,7 +4,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get autoremove && apt-get autocl
 
 RUN mkdir -p /home/app/web/config
 
-RUN addgroup --system app && adduser --system --group app
+RUN addgroup --system --gid 1003 app && adduser --system --uid 1003 app
 
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web/config
