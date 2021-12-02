@@ -4,12 +4,12 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="slider-content text-center">
                     <div class="header-bottom">
-                        <div class="layer2">
-                            <h1 class="title2">My Blog</h1>
-                        </div>
-                        <div class="layer3">
-                            <h2 class="title3">Profesional Blog Page</h2>
-                        </div>
+                        <!--                        <div class="layer2">-->
+                        <!--                            <h1 class="title2">My Blog</h1>-->
+                        <!--                        </div>-->
+                        <!--                        <div class="layer3">-->
+                        <!--                            <h2 class="title3">Profesional Blog Page</h2>-->
+                        <!--                        </div>-->
                     </div>
                 </div>
             </div>
@@ -18,12 +18,6 @@
 </div>
 <div class="container bg-transparent">
     <div class="row">
-        {% if request.user.is_authenticated %}
-
-        <span style="float:right; color:black">Добро пожаловать, {{ user.username }}</span><br/>
-
-        {% endif %}
-
         {% if messages %}
         {% for message in messages %}
         {% if message.tags == 'error' %}
@@ -39,6 +33,5 @@
         {% endif %}
         {% endfor %}
         {% endif %}
-
     </div>
 </div>

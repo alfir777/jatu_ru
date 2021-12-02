@@ -12,7 +12,7 @@
         <li><a class="nav-link  scrollto" href="{{ home_url }}#pricing">Price</a></li>
         <li><a class="nav-link  scrollto" href="{{ home_url }}#blog">News</a></li>
 
-        <li><a class="nav-link scrollto" href="{{ home_url }}#contact">Контакты</a></li>
+        <li><a class="nav-link scrollto" href="{% url 'contact' %}">Контакты</a></li>
 
         {% url 'blog' as blog_url %}
         <li><a class="nav-link scrollto {% if blog_url in request.get_full_path %}active {% endif %}" href="{{ blog_url }}">Блог</a></li>
@@ -42,6 +42,10 @@
             <a {% if request.get_full_path == login_url %} class='nav-link scrollto active' {% endif %} href="{{ user_login_url }}">Вход</a>
         </li>
         {% else %}
+        {% url 'user_profile' as user_profile_url %}
+        <li>
+            <a {% if request.get_full_path == user_profile_url %} class='nav-link scrollto active' {% endif %} href="{{ user_profile_url }}">{{ user.username }}</a>
+        </li>
         {% url 'user_logout' as user_logout_url %}
         <li>
             <a {% if request.get_full_path == user_logout_url %} class='nav-link scrollto active' {% endif %} href="{{ user_logout_url }}">Выход</a>

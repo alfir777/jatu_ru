@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import login, get_user
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import send_mail
@@ -11,24 +12,22 @@ from django.views.generic import ListView, DetailView, TemplateView
 from config.settings import DOMAIN_NAME, EMAIL_SENDER, EMAIL_RECIPIEN
 from .forms import *
 from .models import Post, Category, Tag, Comment
+from .utils import DataMixin
 
 
-class Blog(ListView):
+class Blog(DataMixin, ListView):
     model = Post
     template_name = 'blog/blog.html'
-    context_object_name = 'posts'
     paginate_by = 10
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'{DOMAIN_NAME} | Блог'
-        context['logo_name'] = DOMAIN_NAME
-        return context
+        c_def = self.get_user_context(title=f'{DOMAIN_NAME} | Блог')
+        return dict(list(context.items()) + list(c_def.items()))
 
 
-class PostByCategory(ListView):
+class PostByCategory(DataMixin, ListView):
     template_name = 'blog/category.html'
-    context_object_name = 'posts'
     paginate_by = 10
     allow_empty = False
 
@@ -37,14 +36,12 @@ class PostByCategory(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'{DOMAIN_NAME} | {str(Category.objects.get(slug=self.kwargs["slug"]))}'
-        context['logo_name'] = DOMAIN_NAME
-        return context
+        c_def = self.get_user_context(title=f'{DOMAIN_NAME} | {str(Category.objects.get(slug=self.kwargs["slug"]))}')
+        return dict(list(context.items()) + list(c_def.items()))
 
 
-class PostByTag(ListView):
+class PostByTag(DataMixin, ListView):
     template_name = 'blog/tags.html'
-    context_object_name = 'posts'
     paginate_by = 10
     allow_empty = False
 
@@ -53,15 +50,13 @@ class PostByTag(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'{DOMAIN_NAME} | {Tag.objects.get(slug=self.kwargs["slug"])}'
-        context['logo_name'] = DOMAIN_NAME
-        return context
+        c_def = self.get_user_context(title=f'{DOMAIN_NAME} | {Tag.objects.get(slug=self.kwargs["slug"])}')
+        return dict(list(context.items()) + list(c_def.items()))
 
 
-class GetPost(DetailView):
+class GetPost(DataMixin, DetailView):
     model = Post
     template_name = 'blog/blog_detail.html'
-    context_object_name = 'post'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -78,9 +73,8 @@ class GetPost(DetailView):
             comment._post_url = self.object.get_absolute_url()
         context['form'] = UserCommentForm(initial={'post': self.object.slug})
         context['description'] = self.object.description
-        context['title'] = f'{DOMAIN_NAME} | {self.object.title}'
-        context['logo_name'] = DOMAIN_NAME
-        return context
+        c_def = self.get_user_context(title=f'{DOMAIN_NAME} | {self.object.title}')
+        return dict(list(context.items()) + list(c_def.items()))
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -100,7 +94,7 @@ class GetPost(DetailView):
             return redirect(self.object)
 
 
-class Search(ListView):
+class Search(DataMixin, ListView):
     template_name = 'blog/search.html'
     context_object_name = 'posts'
     paginate_by = 10
@@ -111,9 +105,29 @@ class Search(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['s'] = f"s={self.request.GET.get('s')}&"
-        context['title'] = f'{DOMAIN_NAME} | Поиск'
+        c_def = self.get_user_context(title=f'{DOMAIN_NAME} | Поиск')
+        return dict(list(context.items()) + list(c_def.items()))
+
+
+class UserLogin(SuccessMessageMixin, LoginView):
+    template_name = 'blog/login.html'
+    redirect_field_name = 'blog'
+    redirect_authenticated_user = True
+    authentication_form = UserLoginForm
+    success_messages = 'Вы успешно зарегистрировались'
+
+    def get_success_message(self, cleaned_data):
+        return self.success_messages
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'{DOMAIN_NAME} | Авторизация'
         context['logo_name'] = DOMAIN_NAME
         return context
+
+
+class UserLogout(LogoutView):
+    next_page = 'home'
 
 
 def register(request):
@@ -162,27 +176,7 @@ def restore_password(request):
     return render(request, 'blog/restore_password.html', context=context)
 
 
-class UserLogin(SuccessMessageMixin, LoginView):
-    template_name = 'blog/login.html'
-    redirect_field_name = 'home'
-    redirect_authenticated_user = True
-    authentication_form = UserLoginForm
-    success_messages = 'Вы успешно зарегистрировались'
-
-    def get_success_message(self, cleaned_data):
-        return self.success_messages
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = f'{DOMAIN_NAME} | Авторизация'
-        context['logo_name'] = DOMAIN_NAME
-        return context
-
-
-class UserLogout(LogoutView):
-    next_page = 'home'
-
-
+@login_required(redirect_field_name='blog', login_url='user_login')
 def blog_add_post(request):
     if request.method == 'POST':
         form = BlogForm(request.POST)
@@ -250,10 +244,18 @@ def contact(request):
     return render(request, 'blog/contact.html', context=context)
 
 
-def test(request):
-    return HttpResponse('<h1>TEST</h1>')
-
-
 class RobotsTxtView(TemplateView):
     template_name = 'robots.txt'
     content_type = 'text/plain'
+
+
+def get_profile(request):
+    context = {
+        'title': f'{DOMAIN_NAME} | Контакты',
+        'logo_name': DOMAIN_NAME,
+    }
+    return render(request, 'blog/profile.html', context=context)
+
+
+def page_not_found(request, exception, template_name='blog/404.html'):
+    return render(request, 'blog/404.html')

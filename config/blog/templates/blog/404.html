@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0"
+          name="viewport">
+    <meta name="description"
+          content="{% block description %} Привет, Мир! Когда накипело получать на свои закладки ошибку 404, решил написать свой блог, чтобы больше не терялись.. {% endblock %}">
+    <meta name="keywords"
+          content="блог, разработка, администрирование">
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <!-- Template CSS -->
+    <link type="text/css"
+          media="all"
+          href="{% static 'css/light_404_style.css' %}"
+          rel="stylesheet"/>
+    <!-- Responsive CSS -->
+    <link type="text/css"
+          media="all"
+          href="{% static 'css/light_404_respons.css' %}"
+          rel="stylesheet"/>
+    <link rel="shortcut icon"
+          href="{% static '/img/favicon.png' %}"
+          type="image/x-icon">
+    <!-- Google Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Raleway:300,400,500,600,700,800,900'
+          rel='stylesheet'
+          type='text/css'>
+
+    <!-- =======================================================
+* Distributor: http://bootstraptema.ru/
+======================================================== -->
+
+</head>
+<body>
+
+<!-- Load page -->
+<div class="animationload">
+    <div class="loader">
+    </div>
+</div>
+<!-- End load page -->
+
+<!-- Content Wrapper -->
+<div id="wrapper">
+    <div class="container">
+        <!-- Switcher -->
+        <div class="switcher">
+            <input id="sw"
+                   type="checkbox"
+                   class="switcher-value">
+            <label for="sw"
+                   class="sw_btn"></label>
+            <div class="bg"></div>
+            <div class="text"><span class="text-l">On</span><span class="text-d">Off</span><br/>light</div>
+        </div>
+        <!-- End Switcher -->
+
+        <!-- Dark version -->
+        <div id="dark"
+             class="row text-center">
+            <div class="info">
+                <img src="{% static 'img/light-404/404.png' %}"
+                     alt="404 error"/>
+            </div>
+        </div>
+        <!-- End Dark version -->
+
+        <!-- Light version -->
+        <div id="light"
+             class="row text-center">
+            <!-- Info -->
+            <div class="info">
+                <img src="{% static 'img/light-404/404.gif' %}"
+                     alt="404 error"/>
+                <h4>Страница, которую вы ищете, была перемещена, удалена, переименована или никогда не
+                    существовала.</h4>
+                <a href="{% url 'home' %}"
+                   class="btn">Главная</a>
+                <a href="{% url 'contact' %}"
+                   class="btn btn-brown">Контакты</a>
+            </div>
+            <!-- end Info -->
+        </div>
+        <!-- End Light version -->
+
+    </div>
+    <!-- end container -->
+</div>
+<!-- end Content Wrapper -->
+
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="{% static 'js/vendor/modernizr.custom.js' %}"
+        type="text/javascript"></script>
+<script src="{% static 'js/vendor/jquery.nicescroll.min.js' %}"
+        type="text/javascript"></script>
+<script src="{% static 'js/scripts.js' %}"
+        type="text/javascript"></script>
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+</body>
+</html>
