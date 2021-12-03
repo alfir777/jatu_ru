@@ -7,7 +7,7 @@ register = template.Library()
 
 @register.inclusion_tag('blog/popular_posts_tpl.html')
 def get_popular(cnt=3):
-    posts = Post.objects.order_by('-views')[:cnt]
+    posts = Post.objects.order_by('-views')[:cnt].select_related('category', 'author').prefetch_related('tags')
     return {'posts': posts}
 
 

@@ -25,6 +25,9 @@ class Blog(DataMixin, ListView):
         c_def = self.get_user_context(title=f'{DOMAIN_NAME} | Блог')
         return dict(list(context.items()) + list(c_def.items()))
 
+    def get_queryset(self):
+        return Post.objects.filter(is_published=True).select_related('category', 'author').prefetch_related('tags')
+
 
 class PostByCategory(DataMixin, ListView):
     template_name = 'blog/category.html'
@@ -32,7 +35,10 @@ class PostByCategory(DataMixin, ListView):
     allow_empty = False
 
     def get_queryset(self):
-        return Post.objects.filter(category__slug=self.kwargs['slug'], is_published=True).select_related('category')
+        return Post.objects.filter(
+            category__slug=self.kwargs['slug'],
+            is_published=True
+        ).select_related('category', 'author').prefetch_related('tags')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -46,7 +52,9 @@ class PostByTag(DataMixin, ListView):
     allow_empty = False
 
     def get_queryset(self):
-        return Post.objects.filter(tags__slug=self.kwargs['slug'], is_published=True)
+        return Post.objects.filter(
+            tags__slug=self.kwargs['slug'], is_published=True
+        ).select_related('category', 'author').prefetch_related('tags')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -65,10 +73,10 @@ class GetPost(DetailView):
         self.object.save()
         self.object.refresh_from_db()
         comments = (
-            Comment.objects.filter(post=self.object).order_by('created_at')
+            Comment.objects.filter(
+                post=self.object).order_by('created_at').select_related('post', 'author', 'parent')
         )
-        comment_count = Comment.objects.filter(post=self.object).order_by('created_at').count()
-        context['comment_count'] = comment_count
+        context['comment_count'] = comments.count()
         context['comments'] = comments
         for comment in comments:
             comment._post_url = self.object.get_absolute_url()
@@ -102,7 +110,9 @@ class Search(DataMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Post.objects.filter(title__icontains=self.request.GET.get('s'))
+        return Post.objects.filter(
+            title__icontains=self.request.GET.get('s')
+        ).select_related('category', 'author').prefetch_related('tags')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
