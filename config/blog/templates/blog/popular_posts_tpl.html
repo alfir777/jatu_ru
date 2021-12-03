@@ -18,6 +18,14 @@
             </div>
             <div class="pst-content">
                 <p><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></p>
+                <span class="comments-type">
+                    <i class="bi bi-person"></i>
+                    {{ post.author }}
+                </span>
+                <span class="comments-type">
+                    <i class="bi bi-eye"></i>
+                    {{ post.views }}
+                </span>
             </div>
         </div>
         {% endfor %}

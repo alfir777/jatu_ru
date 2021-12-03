@@ -6,14 +6,14 @@ from blog.models import Category, Comment
 
 
 class BlogForm(forms.Form):
-    title = forms.CharField(max_length=150,
+    title = forms.CharField(max_length=255,
                             label='Название',
                             widget=forms.TextInput(attrs={"class": "form-control"}))
     slug = forms.SlugField(allow_unicode=True,
                            label='Url (slug)',
                            widget=forms.TextInput(attrs={"class": "form-control"}),
                            )
-    description = forms.CharField(max_length=100,
+    description = forms.CharField(max_length=255,
                                   label='Краткое описание (100 символов)',
                                   widget=forms.Textarea(attrs={"class": "form-control", "rows": 2, }))
     content = forms.CharField(label='Текст',
