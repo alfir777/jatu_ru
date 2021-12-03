@@ -54,9 +54,10 @@ class PostByTag(DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-class GetPost(DataMixin, DetailView):
+class GetPost(DetailView):
     model = Post
     template_name = 'blog/blog_detail.html'
+    context_object_name = 'post'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -73,8 +74,9 @@ class GetPost(DataMixin, DetailView):
             comment._post_url = self.object.get_absolute_url()
         context['form'] = UserCommentForm(initial={'post': self.object.slug})
         context['description'] = self.object.description
-        c_def = self.get_user_context(title=f'{DOMAIN_NAME} | {self.object.title}')
-        return dict(list(context.items()) + list(c_def.items()))
+        context['title'] = f'{DOMAIN_NAME} | {self.object.title}'
+        context['logo_name'] = DOMAIN_NAME
+        return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()

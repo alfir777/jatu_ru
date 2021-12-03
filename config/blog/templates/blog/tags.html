@@ -1,69 +1,10 @@
 {% extends 'base.html' %}
 
-{% block description %} {{ category.title }} |{{ title }} {% endblock %}
+{% block description %} {{ tag.title }} |{{ title }} {% endblock %}
 {% block title %} {{ title }} {% endblock %}
 
 {% load static %}
 {% block content %}
-<main id="main">
+{% include 'inc/_posts.html' %}
 
-    {% include 'inc/_header_blog.html' %}
-
-    <div class="blog-page area-padding">
-        <div class="container">
-            <div class="row">
-                <!-- Start left sidebar -->
-                {% include 'inc/_sidebar.html' %}
-                <!-- End left sidebar -->
-
-                <!-- Start single blog -->
-                <div class="col-md-8 col-sm-8 col-xs-12">
-                    <div class="row">
-                        {% for post in posts %}
-                        <div class="col-md-12 col-sm-12 col-xs-12">
-                            <div class="single-blog">
-                                <div class="single-blog-img">
-                                    <a href="{{ post.get_absolute_url }}">
-                                        {% if post.photo %}
-                                        <img src="{{ post.photo.url }}"
-                                             alt="">
-                                        {% else %}
-                                        <img src="{% static '/img/plug.jpg' %}"
-                                             width="85%"
-                                             alt="">
-                                        {% endif %}
-                                    </a>
-                                </div>
-                                <div class="blog-meta">
-                                    <span class="comments-type">
-                                        <i class="bi bi-chat"></i>
-                                        <a href="{{ post.get_absolute_url }}">{{comment_count}} comments</a>
-                                    </span>
-                                    <span class="date-type">
-                                        <i class="bi bi-calendar"></i>{{ post.created_at|date:"Y-m-d H:i:s" }}
-                                    </span>
-                                </div>
-                                <div class="blog-text">
-                                    <h4>
-                                        <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
-                                    </h4>
-                                    <p>
-                                        {{ post.description|safe|linebreaks }}
-                                    </p>
-                                </div>
-                                <span>
-                                    <a href="{{ post.get_absolute_url }}"
-                                       class="ready-btn">Подробнее..</a>
-                                </span>
-                            </div>
-                        </div>
-                        {% endfor %}
-
-                        {% include 'inc/_pagination.html' %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</main>
 {% endblock content %}

@@ -1,3 +1,5 @@
+{% load static %}
+
 <div class="single-blog-page">
     <div class="left-blog">
         <h4>Популярные посты</h4>
@@ -9,7 +11,7 @@
                     <img src="{{ post.photo.url }}"
                          alt="">
                     {% else %}
-                    <img src="https://picsum.photos/id/1060/536/354/?blur=2"
+                    <img src="{% static '/img/plug.jpg' %}"
                          alt="">
                     {% endif %}
                 </a>

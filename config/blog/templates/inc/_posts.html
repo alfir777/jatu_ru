@@ -1,0 +1,97 @@
+{% load static %}
+
+<main id="main">
+
+    {% include 'inc/_header_blog.html' %}
+
+    <div class="blog-page area-padding">
+        <div class="container">
+            <div class="row">
+
+                <!-- Start left sidebar -->
+                {% include 'inc/_sidebar.html' %}
+                <!-- End left sidebar -->
+
+                <!-- Start single blog -->
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                    <div class="row">
+                        {% for post in posts %}
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="single-blog">
+                                <div class="single-blog-img">
+                                    <a href="{{ post.get_absolute_url }}">
+                                        {% if post.photo %}
+                                        <img src="{{ post.photo.url }}"
+                                             alt="">
+                                        {% else %}
+                                        <img src="{% static '/img/plug.jpg' %}"
+                                             width="85%"
+                                             alt="">
+                                        {% endif %}
+                                    </a>
+                                </div>
+                                <div class="blog-meta">
+                                    <span class="comments-type">
+                                        <i class="bi bi-person"></i>
+                                        {{ post.author }}
+                                    </span>
+                                    <span class="date-type">
+                                        <i class="bi bi-calendar"></i>
+                                        {{ post.created_at|date:"Y-m-d" }}
+                                    </span>
+                                    <span class="comments-type">
+                                        <i class="bi bi-pin"></i>
+                                        <a href="{{ post.category.get_absolute_url }}">{{ post.category }}</a>
+                                    </span>
+                                    <span class="comments-type">
+                                        <i class="bi bi-folder"></i>
+                                        {% if post.tags.exists %}
+                                            {% for tag in post.tags.all %}
+                                            <a href="{{ tag.get_absolute_url }}">{{ tag.title }}</a>
+                                            {% endfor %}
+                                        {% else %}
+                                            Нет тегов
+                                        {% endif %}
+                                    </span>
+                                    <span class="comments-type">
+                                        <i class="bi bi-tags"></i>
+                                        Нет меток
+                                    </span>
+                                    <span class="comments-type">
+                                        <i class="bi bi-eye"></i>
+                                        {{ post.views }}
+                                    </span>
+                                    <span class="comments-type">
+                                        <i class="bi bi-chat"></i>
+                                        {% if comment_count %}
+                                        {{comment_count}}
+                                        {% else %}
+                                        0
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="blog-text">
+                                    <h4>
+                                        <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                                    </h4>
+                                    <p>
+                                        {{ post.description|safe|linebreaks }}
+                                    </p>
+                                </div>
+                                <span>
+                                    <a href="{{ post.get_absolute_url }}"
+                                       class="ready-btn">Подробнее..</a>
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        {% include 'inc/_pagination.html' %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main><!-- End #main -->
