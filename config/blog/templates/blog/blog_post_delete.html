@@ -21,16 +21,16 @@
                 <div class="col-md-8 col-sm-8 col-xs-12">
                     <div class="row">
                         <article class="blog-post-wrapper">
-                            <form action="{% url 'blog_add_post' %}"
-                                  method="post">
-                                {% csrf_token %}
+                            <div class="text-center">
+                                <h3>Удаление поста</h3>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <p>Вы уверены, что хотите удалить: "{{ title }}"?</p>
 
-                                {{ form.as_p }}
-                                <div class="text-center">
-                                    <button type="submit"
-                                            class="btn btn-primary btn-block">Добавить запись
-                                    </button>
-                                </div>
+                                        <button type="submit"
+                                                class="btn btn-primary btn-block">Удалить запись
+                                        </button>
+                            </div>
                             </form>
                         </article>
                     </div>
@@ -39,4 +39,5 @@
         </div>
     </div>
 </main>
+
 {% endblock content %}

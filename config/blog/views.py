@@ -1,13 +1,15 @@
 from django.contrib import messages
 from django.contrib.auth import login, get_user
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import send_mail
 from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from config.settings import DOMAIN_NAME, EMAIL_SENDER, EMAIL_RECIPIEN
 from .forms import *
@@ -15,7 +17,7 @@ from .models import Post, Category, Tag, Comment
 from .utils import DataMixin
 
 
-class Blog(DataMixin, ListView):
+class BlogListView(DataMixin, ListView):
     model = Post
     template_name = 'blog/blog.html'
     paginate_by = 10
@@ -29,7 +31,7 @@ class Blog(DataMixin, ListView):
         return Post.objects.filter(is_published=True).select_related('category', 'author').prefetch_related('tags')
 
 
-class PostByCategory(DataMixin, ListView):
+class BlogByCategory(DataMixin, ListView):
     template_name = 'blog/category.html'
     paginate_by = 10
     allow_empty = False
@@ -46,7 +48,7 @@ class PostByCategory(DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-class PostByTag(DataMixin, ListView):
+class BlogByTag(DataMixin, ListView):
     template_name = 'blog/tags.html'
     paginate_by = 10
     allow_empty = False
@@ -62,7 +64,7 @@ class PostByTag(DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
 
 
-class GetPost(DetailView):
+class BlogDetailView(DetailView):
     model = Post
     template_name = 'blog/blog_detail.html'
     context_object_name = 'post'
@@ -87,21 +89,99 @@ class GetPost(DetailView):
         return context
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
+        post = self.get_object()
         if request.user.is_authenticated:
             form = UserCommentForm(request.POST)
         else:
             form = GuestCommentForm(request.POST)
         if form.is_valid():
             form.cleaned_data['author'] = get_user(request)
-            form.cleaned_data['post_id'] = self.object.pk
+            form.cleaned_data['post_id'] = post.pk
             comment = Comment.objects.create(**form.cleaned_data)
             form.save(request=request, obj=comment, form=form)
             messages.add_message(request, messages.SUCCESS, 'Комментарий добавлен')
-            return redirect(self.object)
+            return redirect(post)
         else:
             messages.add_message(request, messages.WARNING, 'Нет прав на добавления комментария')
             return redirect(self.object)
+
+
+class BlogCreateView(LoginRequiredMixin, CreateView):
+    form_class = BlogForm
+    template_name = 'blog/blog_post_add.html'
+    login_url = '/login/'
+    redirect_field_name = '/blog/'
+
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            form = BlogForm(request.POST)
+            if form.is_valid():
+                form.cleaned_data['author'] = get_user(request)
+                post = Post.objects.create(**form.cleaned_data)
+                return redirect(post)
+        else:
+            form = BlogForm()
+        context = {
+            'form': form,
+            'title': f'{DOMAIN_NAME} | Добавление поста',
+            'logo_name': DOMAIN_NAME,
+        }
+        return render(request, 'blog/blog_post_add.html', context=context)
+
+
+class BlogUpdateView(LoginRequiredMixin, UpdateView):
+    Model = Post
+    form_class = BlogForm
+    template_name = 'blog/blog_post_edit.html'
+    login_url = '/login/'
+    redirect_field_name = '/blog/'
+
+    def get_object(self, *args, **kwargs):
+        return Post.objects.get(slug=self.kwargs['slug'])
+
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            form = BlogForm(request.POST)
+            if form.is_valid():
+                post = Post.objects.get(slug=self.kwargs['slug'])
+                if get_user(request) != post.author:
+                    messages.error(request, 'Изменить пост имеет право только автор поста')
+                    return redirect(post)
+                else:
+                    post.title = form.cleaned_data['title']
+                    post.slug = form.cleaned_data['slug']
+                    post.description = form.cleaned_data['description']
+                    post.content = form.cleaned_data['content']
+                    post.is_published = form.cleaned_data['is_published']
+                    post.category = form.cleaned_data['category']
+                    post.save()
+                    return redirect(post)
+        else:
+            form = BlogForm()
+        context = {
+            'form': form,
+            'title': f'{DOMAIN_NAME} | Добавление поста',
+            'logo_name': DOMAIN_NAME,
+        }
+        return render(request, 'blog/blog_post_edit.html', context=context)
+
+
+class BlogDeleteView(LoginRequiredMixin, DeleteView):
+    model = Post
+    template_name = 'blog/blog_post_delete.html'
+    success_url = reverse_lazy('blog')
+    success_message = "Пост был успешно удален."
+
+    def get(self, request, *args, **kwargs):
+        post = self.get_object()
+        if post.author != self.request.user:
+            messages.error(request, 'Пост может удалить только автор поста или администратор')
+            return redirect(self.success_url)
+        return render(request, 'blog/blog_post_delete.html', {'title': post.title})
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(BlogDeleteView, self).delete(request, *args, **kwargs)
 
 
 class Search(DataMixin, ListView):
@@ -186,24 +266,6 @@ def restore_password(request):
         'logo_name': DOMAIN_NAME,
     }
     return render(request, 'blog/restore_password.html', context=context)
-
-
-@login_required(redirect_field_name='blog', login_url='user_login')
-def blog_add_post(request):
-    if request.method == 'POST':
-        form = BlogForm(request.POST)
-        if form.is_valid():
-            form.cleaned_data['author'] = get_user(request)
-            post = Post.objects.create(**form.cleaned_data)
-            return redirect(post)
-    else:
-        form = BlogForm()
-    context = {
-        'form': form,
-        'title': f'{DOMAIN_NAME} | Добавление поста',
-        'logo_name': DOMAIN_NAME,
-    }
-    return render(request, 'blog/blog_add_post.html', context=context)
 
 
 def index(request):

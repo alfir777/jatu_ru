@@ -57,6 +57,13 @@
                         </article>
                         <div class="clear"></div>
 
+                        {% if post.author == request.user or request.user.is_superuser %}
+                        <div class="comment-respond" style='text-align: center;'>
+                            <a href="{% url 'blog_post_edit' slug=post.slug %}"><input type="submit" value="Редактировать" /></a>
+                            <a href="{% url 'blog_post_delete' slug=post.slug %}"><input type="submit" value="Удалить" /></a>
+                        </div>
+                        {% endif %}
+
                         <div class="single-post-comments">
                             <div class="comments-heading">
                                 <h3>{{comment_count}} comments</h3>

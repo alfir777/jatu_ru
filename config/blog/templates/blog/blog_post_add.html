@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block description %} {{ title }} {% endblock %}
+{% block title %} {{ title }} {% endblock %}
+
+{% block content %}
+<main id="main">
+
+    {% include 'inc/_header_blog.html' %}
+
+    <div class="blog-page area-padding">
+        <div class="container">
+            <div class="row">
+
+                <!-- Start left sidebar -->
+                {% include 'inc/_sidebar.html' %}
+                <!-- End left sidebar -->
+
+                <!-- Start single blog -->
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                    <div class="row">
+                        <article class="blog-post-wrapper">
+                            <h3>Добавление поста</h3>
+                            <form action="{% url 'blog_post_add' %}"
+                                  method="post">
+                                {% csrf_token %}
+
+                                {{ form.as_p }}
+                                <div class="text-center">
+                                    <button type="submit"
+                                            class="btn btn-primary btn-block">Добавить запись
+                                    </button>
+                                </div>
+                            </form>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock content %}

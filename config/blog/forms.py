@@ -2,10 +2,14 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 
-from blog.models import Category, Comment
+from blog.models import Category, Comment, Post
 
 
-class BlogForm(forms.Form):
+class BlogForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['title', 'slug', 'description', 'content', 'is_published', 'category']
+
     title = forms.CharField(max_length=255,
                             label='Название',
                             widget=forms.TextInput(attrs={"class": "form-control"}))
