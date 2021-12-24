@@ -7,7 +7,8 @@ from .models import *
 
 
 class PostAdminForm(forms.ModelForm):
-    content = forms.CharField(widget=CKEditorUploadingWidget())
+    description = forms.CharField(widget=CKEditorUploadingWidget(config_name='basic'))
+    content = forms.CharField(widget=CKEditorUploadingWidget(config_name='custom_config'))
 
     class Meta:
         model = Post

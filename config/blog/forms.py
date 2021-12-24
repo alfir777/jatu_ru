@@ -1,3 +1,4 @@
+from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
@@ -18,11 +19,16 @@ class BlogForm(forms.ModelForm):
                            widget=forms.TextInput(attrs={"class": "form-control"}),
                            )
     description = forms.CharField(max_length=255,
-                                  label='Краткое описание (100 символов)',
-                                  widget=forms.Textarea(attrs={"class": "form-control", "rows": 2, }))
+                                  label='Краткое описание (255 символов)',
+                                  widget=CKEditorWidget(
+                                      config_name='basic', attrs={"class": "form-control", "rows": 2, }
+                                  ),
+                                  )
     content = forms.CharField(label='Текст',
                               required=False,
-                              widget=forms.Textarea(attrs={"class": "form-control", "rows": 10, }),
+                              widget=CKEditorWidget(
+                                  config_name='custom_config', attrs={"class": "form-control", "rows": 10, }
+                              ),
                               )
     is_published = forms.BooleanField(label='Опубликовано?', required=False, initial=True)
     category = forms.ModelChoiceField(empty_label='Выберите категорию',
