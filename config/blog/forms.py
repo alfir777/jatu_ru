@@ -9,15 +9,11 @@ from blog.models import Category, Comment, Post
 class BlogForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'slug', 'description', 'content', 'is_published', 'category']
+        fields = ['title', 'description', 'content', 'is_published', 'category']
 
     title = forms.CharField(max_length=255,
-                            label='Название',
+                            label='Название (проверяется на уникальность)',
                             widget=forms.TextInput(attrs={"class": "form-control"}))
-    slug = forms.SlugField(allow_unicode=True,
-                           label='Url (slug)',
-                           widget=forms.TextInput(attrs={"class": "form-control"}),
-                           )
     description = forms.CharField(max_length=255,
                                   label='Краткое описание (255 символов)',
                                   widget=CKEditorWidget(
@@ -27,7 +23,7 @@ class BlogForm(forms.ModelForm):
     content = forms.CharField(label='Текст',
                               required=False,
                               widget=CKEditorWidget(
-                                  config_name='custom_config', attrs={"class": "form-control", "rows": 10, }
+                                  config_name='custom_config', attrs={"class": "form-control", "rows": 20, }
                               ),
                               )
     is_published = forms.BooleanField(label='Опубликовано?', required=False, initial=True)

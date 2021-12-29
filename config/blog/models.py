@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.text import slugify
 
 """
 Category
@@ -61,9 +62,9 @@ class Tag(BaseModel):
 
 
 class Post(BaseModel):
-    title = models.CharField(max_length=255, verbose_name='Заголовок')
+    title = models.CharField(max_length=255, db_index=True, verbose_name='Заголовок')
     description = models.TextField(max_length=255, verbose_name='Описание', default='')
-    slug = models.SlugField(max_length=255, verbose_name='Url', unique=True)
+    slug = models.SlugField(max_length=255, db_index=True, verbose_name='Url', unique=True)
     author = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='posts')
     content = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
@@ -80,6 +81,11 @@ class Post(BaseModel):
 
     def get_absolute_url(self):
         return reverse('post', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        return super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Публикация'

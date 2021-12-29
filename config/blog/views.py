@@ -8,6 +8,7 @@ from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
+from django.utils.text import slugify
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
@@ -116,6 +117,14 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
         if request.method == 'POST':
             form = BlogForm(request.POST)
             if form.is_valid():
+                if Post.objects.get(slug=slugify(form.cleaned_data['title'])):
+                    messages.error(request, 'Название поста должно быть уникальным')
+                    context = {
+                        'form': form,
+                        'title': f'{DOMAIN_NAME} | Добавление поста',
+                        'logo_name': DOMAIN_NAME,
+                    }
+                    return render(request, 'blog/blog_post_add.html', context=context)
                 form.cleaned_data['author'] = get_user(request)
                 post = Post.objects.create(**form.cleaned_data)
                 return redirect(post)
@@ -149,7 +158,6 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
                     return redirect(post)
                 else:
                     post.title = form.cleaned_data['title']
-                    post.slug = form.cleaned_data['slug']
                     post.description = form.cleaned_data['description']
                     post.content = form.cleaned_data['content']
                     post.is_published = form.cleaned_data['is_published']
