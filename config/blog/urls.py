@@ -1,11 +1,11 @@
-from django.urls import path
 from django.contrib.sitemaps.views import sitemap
+from django.urls import path
 from rest_framework import routers
 
 from .api import PostViewSet
-from .views import *
-from .sitemap import PostSitemap
 from .feeds import LatestPostsFeed
+from .sitemap import PostSitemap
+from .views import *
 
 sitemaps = {
     'posts': PostSitemap

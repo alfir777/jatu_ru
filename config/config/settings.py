@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.sites',
     'debug_toolbar',
+    'captcha',
     'ckeditor',
     'ckeditor_uploader',
     'rest_framework',
@@ -353,3 +354,8 @@ CKEDITOR_CONFIGS = {
 }
 
 LOGIN_REDIRECT_URL = 'blog'
+
+RECAPTCHA_PUBLIC_KEY = os.environ['RECAPTCHA_PUBLIC_KEY']
+RECAPTCHA_PRIVATE_KEY = os.environ['RECAPTCHA_PRIVATE_KEY']
+RECAPTCHA_DOMAIN = os.environ['DOMAIN_NAME']
+RECAPTCHA_REQUIRED_SCORE = 0.85

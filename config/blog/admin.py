@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib import admin
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
+from django.forms import CheckboxSelectMultiple
 from django.utils.safestring import mark_safe
 
 from .models import *
@@ -26,8 +27,11 @@ class PostAdmin(admin.ModelAdmin):
     list_editable = ('is_published',)
     list_filter = ('is_published', 'category', 'tags')
     readonly_fields = ('author', 'get_photo', 'views', 'created_at', 'updated_at')
-    fields = ('title', 'description', 'slug', 'category', 'content', 'photo', 'get_photo', 'is_published', 'views',
+    fields = ('title', 'slug', 'description', 'category', 'content', 'photo', 'get_photo', 'is_published', 'views',
               'created_at', 'updated_at', 'tags', 'author')
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
 
     def get_photo(self, obj):
         if obj.photo:
