@@ -68,10 +68,6 @@ services:
     networks:
       - web
       - internal
-    environment:
-      - CF_API_EMAIL=$CLOUDFLARE_EMAIL
-      #- CF_API_KEY=$CLOUDFLARE_API_KEY # 
-      - CF_API_KEY_FILE=/run/secrets/cloudflare_api_key
     secrets:
       - cloudflare_api_key
     labels:
@@ -83,7 +79,7 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       ## HTTP Routers
       - "traefik.http.routers.traefik-rtr.entrypoints=https"
-      - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.$DOMAINNAME`)"
+      - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.$DOMAIN_NAME`)"
       ## Services - API
       - "traefik.http.routers.traefik-rtr.service=api@internal"
       ## Middlewares
@@ -106,12 +102,20 @@ services:
       - db
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.django.rule=Host(`${DOMAIN_NAME}`)"
-      - "traefik.http.routers.django.tls=true"
-      - "traefik.http.routers.django.tls.certresolver=lets-encrypt"
+      ## HTTP Routers
+      - "traefik.http.routers.django-rtr.entrypoints=https"
+      - "traefik.http.routers.django-rtr.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.django-rtr.tls=true"
+      ## Middlewares
+      - "traefik.http.routers.django-rtr.middlewares=no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.django-rtr.service=django-svc"
+      - "traefik.http.services.django-svc.loadbalancer.server.port=8010"
     networks:
       - web
       - internal
+      
+      
   db:
     image: postgres:13-alpine
     container_name: db
