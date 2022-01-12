@@ -1,5 +1,5 @@
 from captcha.fields import ReCaptchaField
-from captcha.widgets import ReCaptchaV3
+from captcha.widgets import ReCaptchaV2Checkbox
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -43,13 +43,13 @@ class BlogForm(forms.ModelForm):
 class ContactForm(forms.Form):
     subject = forms.CharField(label='Тема', widget=forms.TextInput(attrs={"class": "form-control"}))
     content = forms.CharField(label='Текст', widget=forms.Textarea(attrs={"class": "form-control", "rows": 5}))
-    captcha = ReCaptchaField(widget=ReCaptchaV3())
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
 
 
 class UserLoginForm(AuthenticationForm):
     username = forms.CharField(label='Имя пользователя', widget=forms.TextInput(attrs={"class": "form-control"}))
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={"class": "form-control"}))
-    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score': 0.85}))
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
 
 
 class UserRegisterForm(UserCreationForm):
@@ -63,7 +63,7 @@ class UserRegisterForm(UserCreationForm):
                                 widget=forms.PasswordInput(attrs={"class": "form-control"})
                                 )
     email = forms.EmailField(label='E-mail', widget=forms.EmailInput(attrs={"class": "form-control"}))
-    captcha = ReCaptchaField(widget=ReCaptchaV3(attrs={'required_score': 0.85}))
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
 
     class Meta:
         model = User
