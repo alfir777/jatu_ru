@@ -1,3 +1,5 @@
+import os
+
 from django.contrib import messages
 from django.contrib.auth import login, get_user
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -305,10 +307,20 @@ def contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
-            mail = send_mail(form.cleaned_data['subject'],
-                             form.cleaned_data['content'],
+            subject = f'[{os.environ["DOMAIN_NAME"]}] {form.cleaned_data["subject"]}'
+            message = f'{form.cleaned_data["name"]} \n' \
+                      f'{form.cleaned_data["email"]} \n \n ' \
+                      f'{form.cleaned_data["message"]}'
+            copy = form.cleaned_data['copy']
+            recipient = [EMAIL_RECIPIEN, ]
+
+            if copy:
+                recipient.append(form.cleaned_data["email"])
+
+            mail = send_mail(subject,
+                             message,
                              EMAIL_SENDER,
-                             [EMAIL_RECIPIEN],
+                             recipient,
                              fail_silently=True
                              )
             if mail:
@@ -321,6 +333,7 @@ def contact(request):
     context = {
         'form': form,
         'title': f'{DOMAIN_NAME} | Контакты',
+        'email': EMAIL_RECIPIEN,
         'logo_name': DOMAIN_NAME,
     }
     return render(request, 'blog/contact.html', context=context)

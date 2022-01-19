@@ -41,8 +41,13 @@ class BlogForm(forms.ModelForm):
 
 
 class ContactForm(forms.Form):
+    name = forms.CharField(label='Ваше Имя', widget=forms.TextInput(attrs={"class": "form-control"}))
+    email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={"class": "form-control"}))
     subject = forms.CharField(label='Тема', widget=forms.TextInput(attrs={"class": "form-control"}))
-    content = forms.CharField(label='Текст', widget=forms.Textarea(attrs={"class": "form-control", "rows": 5}))
+    message = forms.CharField(label='Текст', widget=forms.Textarea(attrs={"class": "form-control", "rows": 5}))
+    copy = forms.BooleanField(label='Отправить копию себе ',
+                              widget=forms.CheckboxInput,
+                              required=False)
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
 
 
