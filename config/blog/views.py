@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth import login, get_user
@@ -9,6 +10,7 @@ from django.core.mail import send_mail
 from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.template import loader
 from django.urls import reverse_lazy
 from django.utils.text import slugify
 from django.views.generic import ListView, DetailView, TemplateView
@@ -308,22 +310,48 @@ def contact(request):
         form = ContactForm(request.POST)
         if form.is_valid():
             subject = f'[{os.environ["DOMAIN_NAME"]}] {form.cleaned_data["subject"]}'
-            message = f'{form.cleaned_data["name"]} \n' \
-                      f'{form.cleaned_data["email"]} \n \n ' \
-                      f'{form.cleaned_data["message"]}'
             copy = form.cleaned_data['copy']
-            recipient = [EMAIL_RECIPIEN, ]
+            recipient = form.cleaned_data["email"]
+            now = datetime.now()
 
             if copy:
-                recipient.append(form.cleaned_data["email"])
+                message = 'Спасибо за отзыв! Ваше сообщение: ' + form.cleaned_data["message"]
+            else:
+                message = 'Спасибо за отзыв!'
 
-            mail = send_mail(subject,
-                             message,
-                             EMAIL_SENDER,
-                             recipient,
-                             fail_silently=True
-                             )
-            if mail:
+            html_message_recipient = loader.render_to_string(
+                'email/contact.html',
+                {
+                    'name': f'Привет, {form.cleaned_data["name"]}!',
+                    'logo': DOMAIN_NAME,
+                    'message': message,
+                    'year': now.year,
+                }
+            )
+            html_message_sender = loader.render_to_string(
+                'email/contact.html',
+                {
+                    'name': f'[{form.cleaned_data["name"]}] - {recipient}',
+                    'logo': DOMAIN_NAME,
+                    'message': form.cleaned_data["message"],
+                    'year': now.year,
+                }
+            )
+            mail_to_sender = send_mail(subject,
+                                       '',
+                                       EMAIL_SENDER,
+                                       [EMAIL_RECIPIEN, ],
+                                       fail_silently=True,
+                                       html_message=html_message_sender,
+                                       )
+            mail_to_recipient = send_mail(subject,
+                                          '',
+                                          EMAIL_SENDER,
+                                          [recipient, ],
+                                          fail_silently=True,
+                                          html_message=html_message_recipient,
+                                          )
+            if mail_to_sender and mail_to_recipient:
                 messages.success(request, 'Письмо отправлено')
                 return redirect('contact')
             else:
