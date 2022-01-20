@@ -378,7 +378,3 @@ def get_profile(request):
         'logo_name': DOMAIN_NAME,
     }
     return render(request, 'blog/profile.html', context=context)
-
-
-def page_not_found(request, exception, template_name='blog/404.html'):
-    return render(request, 'blog/404.html')
