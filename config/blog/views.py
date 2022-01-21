@@ -121,7 +121,7 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
         if request.method == 'POST':
             form = BlogForm(request.POST)
             if form.is_valid():
-                if Post.objects.get(slug=slugify(form.cleaned_data['title'])):
+                if len(Post.objects.filter(slug=slugify(form.cleaned_data['title']))) == 1:
                     messages.error(request, 'Название поста должно быть уникальным')
                     context = {
                         'form': form,
@@ -129,9 +129,18 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
                         'logo_name': DOMAIN_NAME,
                     }
                     return render(request, 'blog/blog_post_add.html', context=context)
-                form.cleaned_data['author'] = get_user(request)
-                post = Post.objects.create(**form.cleaned_data)
-                return redirect(post)
+                else:
+                    post = Post(title=form.cleaned_data['title'],
+                                author=request.user,
+                                description=form.cleaned_data['description'],
+                                )
+                    post.content = form.cleaned_data['content']
+                    post.is_published = form.cleaned_data['is_published']
+                    post.category = form.cleaned_data['category']
+                    if request.POST.getlist('tags'):
+                        post.tags.set(*request.POST.getlist('tags'))
+                    post.save()
+                    return redirect(post)
         else:
             form = BlogForm()
         context = {
@@ -166,6 +175,7 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
                     post.content = form.cleaned_data['content']
                     post.is_published = form.cleaned_data['is_published']
                     post.category = form.cleaned_data['category']
+                    post.tags.set(*request.POST.getlist('tags'))
                     post.save()
                     return redirect(post)
         else:
