@@ -137,8 +137,10 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
                     post.content = form.cleaned_data['content']
                     post.is_published = form.cleaned_data['is_published']
                     post.category = form.cleaned_data['category']
-                    if request.POST.getlist('tags'):
-                        post.tags.set(*request.POST.getlist('tags'))
+                    tags = request.POST.getlist('tags')
+                    if tags:
+                        post.save()
+                        post.tags.set(tags)
                     post.save()
                     return redirect(post)
         else:
@@ -175,7 +177,8 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
                     post.content = form.cleaned_data['content']
                     post.is_published = form.cleaned_data['is_published']
                     post.category = form.cleaned_data['category']
-                    post.tags.set(*request.POST.getlist('tags'))
+                    tags = request.POST.getlist('tags')
+                    post.tags.set(tags)
                     post.save()
                     return redirect(post)
         else:
