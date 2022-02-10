@@ -36,6 +36,24 @@ if os.environ['DEBUG'] == 'True':
     DEBUG = True
 elif os.environ['DEBUG'] == 'False':
     DEBUG = False
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': os.environ['DJANGO_LOG_LEVEL'],
+                'class': 'logging.FileHandler',
+                'filename': os.environ['DJANGO_LOG_FILE'],
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': os.environ['DJANGO_LOG_LEVEL'],
+                'propagate': True,
+            },
+        },
+    }
 else:
     exit('DO cp ./.env_template.py ./.env and set DEBUG!')
 
@@ -357,5 +375,4 @@ LOGIN_REDIRECT_URL = 'blog'
 
 RECAPTCHA_PUBLIC_KEY = os.environ['RECAPTCHA_PUBLIC_KEY']
 RECAPTCHA_PRIVATE_KEY = os.environ['RECAPTCHA_PRIVATE_KEY']
-RECAPTCHA_DOMAIN = os.environ['DOMAIN_NAME']
-RECAPTCHA_REQUIRED_SCORE = 0.85
+RECAPTCHA_DOMAIN = 'www.recaptcha.net'

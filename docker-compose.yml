@@ -90,7 +90,7 @@ services:
     container_name: web
     env_file:
       - .env
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; gunicorn --bind 0.0.0.0:8000 config.wsgi'
+    command: bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done; gunicorn --bind 0.0.0.0:8000 config.wsgi'
     volumes:
       - .:/home/app/web
     restart: always
@@ -99,7 +99,7 @@ services:
     expose:
       - 8010
     depends_on:
-      - db
+      - postgres
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -114,15 +114,13 @@ services:
     networks:
       - web
       - internal
-      
-      
-  db:
-    image: postgres:13-alpine
-    container_name: db
+  postgres:
+    image: postgres:13
+    container_name: postgres
     env_file:
       - .env
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - /storage/docker/volumes/postgres/data/db:/var/lib/postgresql/data
     restart: always
     ports:
       - "5432:5432"
@@ -134,7 +132,7 @@ services:
       - "POSTGRES_PASSWORD=${DATABASES_PASSWORD}"
     networks:
       - internal
-
+      - web
   nginx:
     image: nginx:1.15-alpine
     container_name: nginx

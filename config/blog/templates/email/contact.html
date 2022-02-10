@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=UTF-8">
+    <title>Contact Form Email</title>
+</head>
+<body style="margin: 0; padding: 0;">
+<table align="center"
+       border="1"
+       cellpadding="0"
+       cellspacing="0"
+       width="600">
+    <tr>
+        <td align="center"
+            style="color: #fff; background: black;">
+            <h2>{{ logo }}</h2>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#ffffff"
+            style="padding: 40px 30px 40px 30px;">
+            <table border="0"
+                   cellpadding="0"
+                   cellspacing="0"
+                   width="100%">
+                <tr>
+                    <td>
+                        {{ name }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 20px 0 30px 0;">
+                        {{ message }}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding: 30px 30px 30px 30px; color: #fff; background: #444;">
+            <table border="1"
+                   cellpadding="0"
+                   cellspacing="0"
+                   width="100%">
+                <tr>
+                    <td width="75%">
+                        &reg; {{ logo }} {{ year }}<br/>
+                        Unsubscribe to this newsletter instantly
+                    </td>
+                    <td>
+                    <td align="right">
+                        <table border="0"
+                               cellpadding="0"
+                               cellspacing="0">
+                            <tr>
+                                <td>
+                                    <a href="https://{{ logo }}/">
+                                        <img src="https://{{ logo }}/static/img/favicon.png"
+                                             alt="{{ logo }}"
+                                             width="38"
+                                             height="38"
+                                             style="display: block;"
+                                             border="0"/>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

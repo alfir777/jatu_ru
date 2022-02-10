@@ -1,3 +1,6 @@
+import os
+from datetime import datetime
+
 from django.contrib import messages
 from django.contrib.auth import login, get_user
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -7,6 +10,7 @@ from django.core.mail import send_mail
 from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.template import loader
 from django.urls import reverse_lazy
 from django.utils.text import slugify
 from django.views.generic import ListView, DetailView, TemplateView
@@ -117,7 +121,7 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
         if request.method == 'POST':
             form = BlogForm(request.POST)
             if form.is_valid():
-                if Post.objects.get(slug=slugify(form.cleaned_data['title'])):
+                if len(Post.objects.filter(slug=slugify(form.cleaned_data['title']))) == 1:
                     messages.error(request, 'Название поста должно быть уникальным')
                     context = {
                         'form': form,
@@ -125,9 +129,20 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
                         'logo_name': DOMAIN_NAME,
                     }
                     return render(request, 'blog/blog_post_add.html', context=context)
-                form.cleaned_data['author'] = get_user(request)
-                post = Post.objects.create(**form.cleaned_data)
-                return redirect(post)
+                else:
+                    post = Post(title=form.cleaned_data['title'],
+                                author=request.user,
+                                description=form.cleaned_data['description'],
+                                )
+                    post.content = form.cleaned_data['content']
+                    post.is_published = form.cleaned_data['is_published']
+                    post.category = form.cleaned_data['category']
+                    tags = request.POST.getlist('tags')
+                    if tags:
+                        post.save()
+                        post.tags.set(tags)
+                    post.save()
+                    return redirect(post)
         else:
             form = BlogForm()
         context = {
@@ -162,6 +177,8 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
                     post.content = form.cleaned_data['content']
                     post.is_published = form.cleaned_data['is_published']
                     post.category = form.cleaned_data['category']
+                    tags = request.POST.getlist('tags')
+                    post.tags.set(tags)
                     post.save()
                     return redirect(post)
         else:
@@ -305,13 +322,49 @@ def contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
-            mail = send_mail(form.cleaned_data['subject'],
-                             form.cleaned_data['content'],
-                             EMAIL_SENDER,
-                             [EMAIL_RECIPIEN],
-                             fail_silently=True
-                             )
-            if mail:
+            subject = f'[{os.environ["DOMAIN_NAME"]}] {form.cleaned_data["subject"]}'
+            copy = form.cleaned_data['copy']
+            recipient = form.cleaned_data["email"]
+            now = datetime.now()
+
+            if copy:
+                message = 'Спасибо за отзыв! Ваше сообщение: ' + form.cleaned_data["message"]
+            else:
+                message = 'Спасибо за отзыв!'
+
+            html_message_recipient = loader.render_to_string(
+                'email/contact.html',
+                {
+                    'name': f'Привет, {form.cleaned_data["name"]}!',
+                    'logo': DOMAIN_NAME,
+                    'message': message,
+                    'year': now.year,
+                }
+            )
+            html_message_sender = loader.render_to_string(
+                'email/contact.html',
+                {
+                    'name': f'[{form.cleaned_data["name"]}] - {recipient}',
+                    'logo': DOMAIN_NAME,
+                    'message': form.cleaned_data["message"],
+                    'year': now.year,
+                }
+            )
+            mail_to_sender = send_mail(subject,
+                                       '',
+                                       EMAIL_SENDER,
+                                       [EMAIL_RECIPIEN, ],
+                                       fail_silently=True,
+                                       html_message=html_message_sender,
+                                       )
+            mail_to_recipient = send_mail(subject,
+                                          '',
+                                          EMAIL_SENDER,
+                                          [recipient, ],
+                                          fail_silently=True,
+                                          html_message=html_message_recipient,
+                                          )
+            if mail_to_sender and mail_to_recipient:
                 messages.success(request, 'Письмо отправлено')
                 return redirect('contact')
             else:
@@ -321,6 +374,7 @@ def contact(request):
     context = {
         'form': form,
         'title': f'{DOMAIN_NAME} | Контакты',
+        'email': EMAIL_RECIPIEN,
         'logo_name': DOMAIN_NAME,
     }
     return render(request, 'blog/contact.html', context=context)
@@ -337,7 +391,3 @@ def get_profile(request):
         'logo_name': DOMAIN_NAME,
     }
     return render(request, 'blog/profile.html', context=context)
-
-
-def page_not_found(request, exception, template_name='blog/404.html'):
-    return render(request, 'blog/404.html')
