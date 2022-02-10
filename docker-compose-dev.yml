@@ -1,0 +1,79 @@
+version: '3'
+
+networks:
+  web:
+    external: true
+  internal:
+    external: false
+
+services:
+  web:
+    build: .
+    container_name: web
+    env_file:
+      - .env
+    command: bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done; gunicorn --bind 0.0.0.0:8000 config.wsgi'
+    volumes:
+      - .:/home/app/web
+    restart: always
+    ports:
+      - '8010:8000'
+    expose:
+      - 8010
+    depends_on:
+      - postgres
+    labels:
+      - "traefik.enable=true"
+      #- "traefik.http.routers.django.rule=Host(`$DOMAIN_NAME`)"
+      #- "traefik.http.routers.django.tls=true"
+      ## HTTP Routers
+      - "traefik.http.routers.django-rtr.entrypoints=https"
+      - "traefik.http.routers.django-rtr.rule=Host(`$DOMAIN_NAME`)"
+      ## Middlewares
+      - "traefik.http.routers.django-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.django-rtr.service=django-svc"
+      - "traefik.http.services.django-svc.loadbalancer.server.port=8000"
+      
+    networks:
+      - web
+      - internal
+      
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    env_file:
+      - .env
+    volumes:
+      - /storage/docker/volumes/postgres/data/db:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+    environment:
+      - "POSTGRES_DB=${DATABASES_NAME}"
+      - "POSTGRES_USER=${DATABASES_USER}"
+      - "POSTGRES_PASSWORD=${DATABASES_PASSWORD}"
+    networks:
+      - internal
+      - web
+  nginx:
+    image: nginx:1.15-alpine
+    container_name: nginx
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./config/static:/static
+      - ./config/media:/media
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.static-http.entrypoints=https"      
+      - "traefik.http.routers.static-http.rule=Host(`${DOMAIN_NAME}`) && PathPrefix(`/static`,`/media`)"
+    networks:
+      - web
+      - internal
+    depends_on:
+      - web

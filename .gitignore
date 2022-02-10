@@ -10,4 +10,4 @@ db.sqlite3
 /config/blog/migrations/
 /config/media/
 acme.json
-traefik_dynamic.toml
+.htpasswd
