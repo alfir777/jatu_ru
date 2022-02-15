@@ -85,7 +85,7 @@ services:
       - .env
     command: bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done; gunicorn --bind 0.0.0.0:8000 config.wsgi'
     volumes:
-      - .:/home/app/web
+      - .:/home/user/web
     restart: always
     ports:
       - '8010:8000'
@@ -95,8 +95,6 @@ services:
       - postgres
     labels:
       - "traefik.enable=true"
-      #- "traefik.http.routers.django.rule=Host(`$DOMAIN_NAME`)"
-      #- "traefik.http.routers.django.tls=true"
       ## HTTP Routers
       - "traefik.http.routers.django-rtr.entrypoints=https"
       - "traefik.http.routers.django-rtr.rule=Host(`$DOMAIN_NAME`)"
@@ -106,7 +104,7 @@ services:
       - "traefik.http.routers.django-rtr.service=django-svc"
       - "traefik.http.services.django-svc.loadbalancer.server.port=8000"
       ## Disable from watchtower
-      - "com.centurylinklabs.watchtower.enable=`false`"
+      - "com.centurylinklabs.watchtower.enable=false"
     networks:
       - web
       - internal
