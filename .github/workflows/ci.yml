@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        name: set env
+      - name: Run tests
         with:
           script: |
             export SECRET_KEY=${{ secrets.SECRET_KEY }}
@@ -54,6 +54,5 @@ jobs:
             echo RECAPTCHA_PRIVATE_KEY=${{ secrets.RECAPTCHA_PRIVATE_KEY }} >> .env
             echo CLOUDFLARE_EMAIL=${{ secrets.CLOUDFLARE_EMAIL }} >> .env
             echo CLOUDFLARE_API_KEY=${{ secrets.CLOUDFLARE_API_KEY }} >> .env
-      - name: Run tests
         run: docker-compose up --exit-code-from tests tests
 
