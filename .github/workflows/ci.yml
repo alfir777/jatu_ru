@@ -54,5 +54,6 @@ jobs:
             echo RECAPTCHA_PRIVATE_KEY=${{ secrets.RECAPTCHA_PRIVATE_KEY }} >> .env
             echo CLOUDFLARE_EMAIL=${{ secrets.CLOUDFLARE_EMAIL }} >> .env
             echo CLOUDFLARE_API_KEY=${{ secrets.CLOUDFLARE_API_KEY }} >> .env
+      - uses: actions/checkout@v3
         run: docker-compose up --exit-code-from tests tests
 
