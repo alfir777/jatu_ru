@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: set env
+        name: set env
         with:
           script: |
             export SECRET_KEY=${{ secrets.SECRET_KEY }}
