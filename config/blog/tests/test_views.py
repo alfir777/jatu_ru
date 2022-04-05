@@ -81,18 +81,6 @@ class ContactTest(TestCase):
         self.assertTemplateUsed(response, 'blog/contact.html')
 
 
-class PortfolioTest(TestCase):
-
-    def test_portfolio_url_exists_at_desired_location(self):
-        response = self.client.get('/portfolio/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_portfolio_uses_correct_template(self):
-        response = self.client.get(reverse('portfolio'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'blog/portfolio.html')
-
-
 class IndexTest(TestCase):
 
     def test_index_url_exists_at_desired_location(self):
