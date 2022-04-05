@@ -32,7 +32,7 @@ jobs:
             export RECAPTCHA_PRIVATE_KEY=${{ secrets.RECAPTCHA_PRIVATE_KEY }}
             export CLOUDFLARE_EMAIL=${{ secrets.CLOUDFLARE_EMAIL }}
             export CLOUDFLARE_API_KEY=${{ secrets.CLOUDFLARE_API_KEY }}
-            echo SECRET_KEY=${{ secrets.SECRET_KEY }} > ../.env
+            echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> ../.env
             echo DOMAIN_NAME=${{ secrets.DOMAIN_NAME }} >> ../.env
             echo DEBUG=${{ secrets.DEBUG }} >> ../.env
             echo DJANGO_LOG_LEVEL=${{ secrets.DJANGO_LOG_LEVEL }} >> ../.env
