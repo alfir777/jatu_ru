@@ -109,6 +109,19 @@ services:
       - web
       - internal
 
+  tests:
+    build: .
+    container_name: tests
+    env_file:
+      - .env
+    command: bash -c 'python3 manage.py test'
+    volumes:
+      - .:/home/user/web
+    restart: always
+    networks:
+      - web
+      - internal
+
   postgres:
     image: postgres:13
     container_name: postgres
