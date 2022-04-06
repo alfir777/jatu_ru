@@ -1,5 +1,7 @@
 # Блог JaTu.Ru
 
+<img src="https://github.com/alfir777/jatu_ru/workflows/CI/badge.svg?branch=master">
+
 Блог на Django 3, реализован без привязки к домену
 
 ## Запуск
