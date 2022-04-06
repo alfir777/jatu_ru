@@ -21,8 +21,8 @@ RUN pip install -r $HOME/requirements.txt
 
 RUN chown -R user:user $USER_HOME
 
-RUN find $USER_HOME -type d -exec chmod 755 {} \
+RUN find $USER_HOME -type d -exec chmod 755 {} \;
 
-RUN find $USER_HOME -type f -exec chmod 644 {} \
+RUN find $USER_HOME -type f -exec chmod 644 {} \;
 
 USER user
