@@ -34,8 +34,44 @@ DOMAIN_NAME = os.environ['DOMAIN_NAME']
 # SECURITY WARNING: don't run with debug turned on in production!
 if os.environ['DEBUG'] == 'True':
     DEBUG = True
+    # Application definition
+    # development
+    INSTALLED_APPS = [
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        'django.contrib.sitemaps',
+        'django.contrib.sites',
+        'debug_toolbar',
+        'captcha',
+        'ckeditor',
+        'ckeditor_uploader',
+        'rest_framework',
+        'blog.apps.BlogConfig',
+    ]
 elif os.environ['DEBUG'] == 'False':
     DEBUG = False
+    # Application definition
+
+    INSTALLED_APPS = [
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        'django.contrib.sitemaps',
+        'django.contrib.sites',
+        'captcha',
+        'ckeditor',
+        'ckeditor_uploader',
+        'rest_framework',
+        'blog.apps.BlogConfig',
+    ]
+
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -58,25 +94,6 @@ else:
     exit('DO cp ./.env_template.py ./.env and set DEBUG!')
 
 ALLOWED_HOSTS = list(os.environ['ALLOWED_HOSTS'].split(', '))
-
-# Application definition
-
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.sitemaps',
-    'django.contrib.sites',
-    'debug_toolbar',
-    'captcha',
-    'ckeditor',
-    'ckeditor_uploader',
-    'rest_framework',
-    'blog.apps.BlogConfig',
-]
 
 SITE_ID = 1
 
