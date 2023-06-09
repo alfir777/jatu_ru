@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: docker network create web
         run: |
-          docker network create web
+          docker network create direct_net
       - name: Create env file
         run: |
           touch .env
