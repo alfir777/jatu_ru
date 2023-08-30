@@ -22,6 +22,13 @@
                     <div class="row">
                         <article class="blog-post-wrapper">
                             <h3>Редактирование поста</h3>
+			    <style>
+    				.cke_top {
+	            		position: sticky;
+		            	left: 0;
+			        top: 61px;
+			    }
+			    </style>
                             <form action="{% url 'blog_post_edit' slug=post.slug %}"
                                   method="post">
                                 {% csrf_token %}
