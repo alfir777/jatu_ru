@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
+import sentry_sdk
 from dotenv import load_dotenv
+from sentry_sdk.integrations.django import DjangoIntegration
 
 if 'DEBUG' not in os.environ:
     if os.path.isfile('../.env'):
@@ -393,3 +395,8 @@ LOGIN_REDIRECT_URL = 'blog'
 RECAPTCHA_PUBLIC_KEY = os.environ['RECAPTCHA_PUBLIC_KEY']
 RECAPTCHA_PRIVATE_KEY = os.environ['RECAPTCHA_PRIVATE_KEY']
 RECAPTCHA_DOMAIN = 'www.recaptcha.net'
+
+sentry_sdk.init(
+    dsn=os.environ['SENTRY_SDK_DSN'],
+    integrations=[DjangoIntegration()]
+)
