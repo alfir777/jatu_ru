@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+
 from pytils.translit import slugify
 
 """

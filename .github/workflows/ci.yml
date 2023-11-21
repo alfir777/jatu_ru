@@ -15,6 +15,7 @@ jobs:
       - name: Create env file
         run: |
           touch .env
+          echo SERVER_ROLE=${{ secrets.SERVER_ROLE }} >> .env
           echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
           echo DOMAIN_NAME=${{ secrets.DOMAIN_NAME }} >> .env
           echo DEBUG=${{ secrets.DEBUG }} >> .env

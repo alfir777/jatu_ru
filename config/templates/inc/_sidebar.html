@@ -18,7 +18,7 @@
                 </div>
             </form>
         </div>
-        {% if request.user.is_authenticated %}
+        {% if request.user.is_authenticated and request.user.is_staff %}
         <div class="single-blog-page">
             <div class="left-blog">
                 <h4><a class="nav-link active"

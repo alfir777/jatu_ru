@@ -1,8 +1,12 @@
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
+
 from ckeditor.widgets import CKEditorWidget
+
+from config.settings import SERVER_ROLE
+
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
 from blog.models import Category, Comment, Post, Tag
@@ -48,13 +52,15 @@ class ContactForm(forms.Form):
     copy = forms.BooleanField(label='Отправить копию себе ',
                               widget=forms.CheckboxInput,
                               required=False)
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
+    if SERVER_ROLE == 'production' or SERVER_ROLE == 'staging':
+        captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
 
 
 class UserLoginForm(AuthenticationForm):
     username = forms.CharField(label='Имя пользователя', widget=forms.TextInput(attrs={"class": "form-control"}))
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={"class": "form-control"}))
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
+    if SERVER_ROLE == 'production' or SERVER_ROLE == 'staging':
+        captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
 
 
 class UserRegisterForm(UserCreationForm):
@@ -68,7 +74,8 @@ class UserRegisterForm(UserCreationForm):
                                 widget=forms.PasswordInput(attrs={"class": "form-control"})
                                 )
     email = forms.EmailField(label='E-mail', widget=forms.EmailInput(attrs={"class": "form-control"}))
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
+    if SERVER_ROLE == 'production' or SERVER_ROLE == 'staging':
+        captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
 
     class Meta:
         model = User

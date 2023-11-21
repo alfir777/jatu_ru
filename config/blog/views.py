@@ -1,24 +1,27 @@
 import os
 from datetime import datetime
 
+from config.settings import DOMAIN_NAME, EMAIL_RECIPIEN, EMAIL_SENDER
+
 from django.contrib import messages
-from django.contrib.auth import login, get_user
+from django.contrib.auth import get_user, login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import send_mail
 from django.db.models import F
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 from django.template import loader
 from django.urls import reverse_lazy
 from django.utils.text import slugify
-from django.views.generic import ListView, DetailView, TemplateView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from config.settings import DOMAIN_NAME, EMAIL_SENDER, EMAIL_RECIPIEN
-from .forms import *
-from .models import Post, Category, Tag, Comment
+from .forms import (BlogForm, ContactForm, GuestCommentForm, RestorePasswordForm,
+                    UserCommentForm, UserLoginForm, UserRegisterForm)
+from .models import Category, Comment, Post, Tag
 from .utils import DataMixin
 
 
@@ -120,7 +123,7 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
         if request.method == 'POST':
             form = BlogForm(request.POST)
-            if form.is_valid():
+            if form.is_valid() and request.user.is_staff:
                 if len(Post.objects.filter(slug=slugify(form.cleaned_data['title']))) == 1:
                     messages.error(request, 'Название поста должно быть уникальным')
                     context = {
@@ -143,6 +146,8 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
                         post.tags.set(tags)
                     post.save()
                     return redirect(post)
+            elif form.is_valid() and not request.user.is_staff:
+                messages.add_message(request, messages.WARNING, 'Нет прав на добавление поста')
         else:
             form = BlogForm()
         context = {
@@ -166,7 +171,7 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
     def post(self, request, *args, **kwargs):
         if request.method == 'POST':
             form = BlogForm(request.POST)
-            if form.is_valid():
+            if form.is_valid() and request.user.is_staff:
                 post = Post.objects.get(slug=self.kwargs['slug'])
                 if get_user(request) != post.author:
                     messages.error(request, 'Изменить пост имеет право только автор поста')
@@ -181,6 +186,8 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
                     post.tags.set(tags)
                     post.save()
                     return redirect(post)
+            elif form.is_valid() and not request.user.is_staff:
+                messages.add_message(request, messages.WARNING, 'Нет прав на изменение поста')
         else:
             form = BlogForm()
         context = {
@@ -197,7 +204,7 @@ class BlogDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('blog')
     success_message = "Пост был успешно удален."
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs) -> HttpResponse:
         post = self.get_object()
         if post.author != self.request.user:
             messages.error(request, 'Пост может удалить только автор поста или администратор')

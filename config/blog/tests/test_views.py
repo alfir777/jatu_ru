@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from blog.models import Category, Post, Tag
+from blog.models import Category, Post
 
 USER_EMAIL = 'test@company.com'
 OLD_PASSWORD = 'TestPassword1#'
@@ -105,7 +105,7 @@ class RestorePasswordTest(TestCase):
         self.assertTemplateUsed(response, 'blog/restore_password.html')
 
     def test_post_restore_password(self):
-        user = User.objects.create(username='test', email=USER_EMAIL)
+        _ = User.objects.create(username='test', email=USER_EMAIL)
         response = self.client.post(reverse('restore_password'), {'email': USER_EMAIL})
         self.assertEqual(response.status_code, 200)
         from django.core.mail import outbox
