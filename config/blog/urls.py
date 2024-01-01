@@ -1,11 +1,15 @@
 from django.contrib.sitemaps.views import sitemap
 from django.urls import path
+
 from rest_framework import routers
 
 from .api import PostViewSet
 from .feeds import LatestPostsFeed
 from .sitemap import PostSitemap
-from .views import *
+from .views import (BlogByCategory, BlogByTag, BlogCreateView, BlogDeleteView, BlogDetailView, BlogListView,
+                    BlogUpdateView, RobotsTxtView, Search, UserLogin, UserLogout, contact, get_profile, index,
+                    register, restore_password)
+
 
 sitemaps = {
     'posts': PostSitemap
@@ -32,7 +36,6 @@ urlpatterns = [
     path('robots.txt', RobotsTxtView.as_view()),
     path('search/', Search.as_view(), name='search'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
-
 ]
 
 urlpatterns += router.urls

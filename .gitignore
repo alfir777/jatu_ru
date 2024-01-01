@@ -3,9 +3,11 @@
 /venv/
 /config/static/
 /data/db/
+/config/media/
+__pycache__
 *.log
 .env
 db.sqlite3
-/config/media/
 acme.json
 .htpasswd
+.DS_Store

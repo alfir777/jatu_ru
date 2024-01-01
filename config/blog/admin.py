@@ -1,10 +1,12 @@
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
+
 from django import forms
 from django.contrib import admin
-from ckeditor_uploader.widgets import CKEditorUploadingWidget
+from django.db import models
 from django.forms import CheckboxSelectMultiple
 from django.utils.safestring import mark_safe
 
-from .models import *
+from blog.models import Category, Comment, Post, Tag
 
 
 class PostAdminForm(forms.ModelForm):

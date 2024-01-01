@@ -12,8 +12,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
-import sentry_sdk
 from dotenv import load_dotenv
+
+import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
 if 'DEBUG' not in os.environ:
@@ -32,6 +33,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ['SECRET_KEY']
 
 DOMAIN_NAME = os.environ['DOMAIN_NAME']
+
+SERVER_ROLE = os.environ['SERVER_ROLE']  # develop, staging, production
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if os.environ['DEBUG'] == 'True':
@@ -54,7 +57,21 @@ if os.environ['DEBUG'] == 'True':
         'rest_framework',
         'blog.apps.BlogConfig',
     ]
+
+    MIDDLEWARE = [
+        'django.middleware.security.SecurityMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    ]
+
 elif os.environ['DEBUG'] == 'False':
+    CSRF_TRUSTED_ORIGINS = [f'https://{os.environ["DOMAIN_NAME"].lower()}',
+                            f'https://www.{os.environ["DOMAIN_NAME"].lower()}',]
     DEBUG = False
     # Application definition
 
@@ -74,41 +91,41 @@ elif os.environ['DEBUG'] == 'False':
         'blog.apps.BlogConfig',
     ]
 
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'file': {
-                'level': os.environ['DJANGO_LOG_LEVEL'],
-                'class': 'logging.FileHandler',
-                'filename': os.environ['DJANGO_LOG_FILE'],
+    MIDDLEWARE = [
+        'django.middleware.security.SecurityMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    ]
+
+    if os.environ.get('LOGGING_ON'):
+        LOGGING = {
+            'version': 1,
+            'disable_existing_loggers': False,
+            'handlers': {
+                'file': {
+                    'level': os.environ['DJANGO_LOG_LEVEL'],
+                    'class': 'logging.FileHandler',
+                    'filename': os.environ['DJANGO_LOG_FILE'],
+                },
             },
-        },
-        'loggers': {
-            'django': {
-                'handlers': ['file'],
-                'level': os.environ['DJANGO_LOG_LEVEL'],
-                'propagate': True,
+            'loggers': {
+                'django': {
+                    'handlers': ['file'],
+                    'level': os.environ['DJANGO_LOG_LEVEL'],
+                    'propagate': True,
+                },
             },
-        },
-    }
+        }
 else:
     exit('DO cp ./.env_template.py ./.env and set DEBUG!')
 
 ALLOWED_HOSTS = list(os.environ['ALLOWED_HOSTS'].split(', '))
 
 SITE_ID = 1
-
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-]
 
 ROOT_URLCONF = 'config.urls'
 
@@ -392,11 +409,14 @@ CKEDITOR_CONFIGS = {
 
 LOGIN_REDIRECT_URL = 'blog'
 
-RECAPTCHA_PUBLIC_KEY = os.environ['RECAPTCHA_PUBLIC_KEY']
-RECAPTCHA_PRIVATE_KEY = os.environ['RECAPTCHA_PRIVATE_KEY']
-RECAPTCHA_DOMAIN = 'www.recaptcha.net'
+if SERVER_ROLE == 'production':
+    RECAPTCHA_PUBLIC_KEY = os.environ['RECAPTCHA_PUBLIC_KEY']
+    RECAPTCHA_PRIVATE_KEY = os.environ['RECAPTCHA_PRIVATE_KEY']
+    RECAPTCHA_DOMAIN = 'www.recaptcha.net'
+else:
+    RECAPTCHA_PUBLIC_KEY = RECAPTCHA_PRIVATE_KEY = RECAPTCHA_DOMAIN = ''
 
 sentry_sdk.init(
-    dsn=os.environ['SENTRY_SDK_DSN'],
+    dsn=os.environ.get('SENTRY_SDK_DSN', ''),
     integrations=[DjangoIntegration()]
 )
