@@ -2,16 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ '**' ]
 
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
-      - name: docker network create web
-        run: |
-          docker network create direct_net
       - name: Create env file
         run: |
           touch .env
@@ -38,4 +35,4 @@ jobs:
           echo CLOUDFLARE_EMAIL=${{ secrets.CLOUDFLARE_EMAIL }} >> .env
           echo CLOUDFLARE_API_KEY=${{ secrets.CLOUDFLARE_API_KEY }} >> .env
       - name: Run tests
-        run: docker-compose up --exit-code-from tests tests
+        run: docker compose up --exit-code-from tests tests
