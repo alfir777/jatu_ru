@@ -49,9 +49,6 @@ class ContactForm(forms.Form):
     email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={"class": "form-control"}))
     subject = forms.CharField(label='Тема', widget=forms.TextInput(attrs={"class": "form-control"}))
     message = forms.CharField(label='Текст', widget=forms.Textarea(attrs={"class": "form-control", "rows": 5}))
-    copy = forms.BooleanField(label='Отправить копию себе ',
-                              widget=forms.CheckboxInput,
-                              required=False)
     if SERVER_ROLE == 'production' or SERVER_ROLE == 'staging':
         captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
 

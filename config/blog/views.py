@@ -330,24 +330,9 @@ def contact(request):
         form = ContactForm(request.POST)
         if form.is_valid():
             subject = f'[{os.environ["DOMAIN_NAME"]}] {form.cleaned_data["subject"]}'
-            copy = form.cleaned_data['copy']
             recipient = form.cleaned_data["email"]
             now = datetime.now()
 
-            if copy:
-                message = 'Спасибо за отзыв! Ваше сообщение: ' + form.cleaned_data["message"]
-            else:
-                message = 'Спасибо за отзыв!'
-
-            html_message_recipient = loader.render_to_string(
-                'email/contact.html',
-                {
-                    'name': f'Привет, {form.cleaned_data["name"]}!',
-                    'logo': DOMAIN_NAME,
-                    'message': message,
-                    'year': now.year,
-                }
-            )
             html_message_sender = loader.render_to_string(
                 'email/contact.html',
                 {
@@ -364,14 +349,7 @@ def contact(request):
                                        fail_silently=True,
                                        html_message=html_message_sender,
                                        )
-            mail_to_recipient = send_mail(subject,
-                                          '',
-                                          EMAIL_SENDER,
-                                          [recipient, ],
-                                          fail_silently=True,
-                                          html_message=html_message_recipient,
-                                          )
-            if mail_to_sender and mail_to_recipient:
+            if mail_to_sender:
                 messages.success(request, 'Письмо отправлено')
                 return redirect('contact')
             else:
