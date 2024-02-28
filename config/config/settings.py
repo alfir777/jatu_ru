@@ -17,11 +17,8 @@ from dotenv import load_dotenv
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-if 'DEBUG' not in os.environ:
-    if os.path.isfile('../.env'):
-        load_dotenv('../.env')
-    else:
-        exit('DO cp ../.env_template.py ../.env and set token!')
+if os.path.isfile('../.env'):
+    load_dotenv('../.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,14 +27,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = os.environ.get('SECRET_KEY', 'change_me')
 
-DOMAIN_NAME = os.environ['DOMAIN_NAME']
+DOMAIN_NAME = os.environ.get('DOMAIN_NAME', 'example.com')
 
-SERVER_ROLE = os.environ['SERVER_ROLE']  # develop, staging, production
+SERVER_ROLE = os.environ.get('SERVER_ROLE', 'production')  # develop, staging, production
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if os.environ['DEBUG'] == 'True':
+if os.environ.get('DEBUG', 'True') == 'True':
     DEBUG = True
     # Application definition
     # development
@@ -69,9 +66,9 @@ if os.environ['DEBUG'] == 'True':
         'debug_toolbar.middleware.DebugToolbarMiddleware',
     ]
 
-elif os.environ['DEBUG'] == 'False':
-    CSRF_TRUSTED_ORIGINS = [f'https://{os.environ["DOMAIN_NAME"].lower()}',
-                            f'https://www.{os.environ["DOMAIN_NAME"].lower()}',]
+elif os.environ.get('DEBUG', 'True') == 'False':
+    CSRF_TRUSTED_ORIGINS = [f'https://{DOMAIN_NAME.lower()}',
+                            f'https://www.{DOMAIN_NAME.lower()}',]
     DEBUG = False
     # Application definition
 
@@ -107,23 +104,21 @@ elif os.environ['DEBUG'] == 'False':
             'disable_existing_loggers': False,
             'handlers': {
                 'file': {
-                    'level': os.environ['DJANGO_LOG_LEVEL'],
+                    'level': os.environ.get('DJANGO_LOG_LEVEL', 'ERROR'),
                     'class': 'logging.FileHandler',
-                    'filename': os.environ['DJANGO_LOG_FILE'],
+                    'filename': os.environ.get('DJANGO_LOG_FILE', 'debug.log'),
                 },
             },
             'loggers': {
                 'django': {
                     'handlers': ['file'],
-                    'level': os.environ['DJANGO_LOG_LEVEL'],
+                    'level': os.environ.get('DJANGO_LOG_LEVEL', 'ERROR'),
                     'propagate': True,
                 },
             },
         }
-else:
-    exit('DO cp ./.env_template.py ./.env and set DEBUG!')
 
-ALLOWED_HOSTS = list(os.environ['ALLOWED_HOSTS'].split(', '))
+ALLOWED_HOSTS = list(os.environ.get('ALLOWED_HOSTS', 'localhost').split(', '))
 
 SITE_ID = 1
 
@@ -152,22 +147,22 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-if os.environ['TYPE_DATABASES'] == 'sqlite3':
+if os.environ.get('TYPE_DATABASES', 'sqlite3') == 'sqlite3':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-elif os.environ['TYPE_DATABASES'] == 'postgresql':
+elif os.environ.get('TYPE_DATABASES', 'sqlite3') == 'postgresql':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ['DATABASES_NAME'],
-            'USER': os.environ['DATABASES_USER'],
-            'PASSWORD': os.environ['DATABASES_PASSWORD'],
-            'HOST': os.environ['DATABASES_HOST'],
-            'PORT': os.environ['DATABASES_PORT'],
+            'NAME': os.environ.get('DATABASES_NAME', 'DATABASES_NAME'),
+            'USER': os.environ.get('DATABASES_USER', 'DATABASES_USER'),
+            'PASSWORD': os.environ.get('DATABASES_PASSWORD', 'DATABASES_PASSWORD'),
+            'HOST': os.environ.get('DATABASES_HOST', 'DATABASES_HOST'),
+            'PORT': os.environ.get('DATABASES_PORT', 5432),
         }
     }
 else:
@@ -225,16 +220,16 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-EMAIL_HOST = os.environ['EMAIL_HOST']
-EMAIL_PORT = 465
-EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
-EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.example.com')
+EMAIL_PORT = os.environ.get('EMAIL_PORT', 465)
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'user@example.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'password')
 EMAIL_USER_TLS = False
 EMAIL_USER_SSL = True
 EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
 
-EMAIL_SENDER = os.environ['EMAIL_SENDER']
-EMAIL_RECIPIEN = os.environ['EMAIL_RECIPIEN']
+EMAIL_SENDER = os.environ.get('EMAIL_SENDER', 'noreply@example.com')
+EMAIL_RECIPIEN = os.environ.get('EMAIL_RECIPIEN', 'user@example.com')
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
@@ -410,8 +405,8 @@ CKEDITOR_CONFIGS = {
 LOGIN_REDIRECT_URL = 'blog'
 
 if SERVER_ROLE == 'production':
-    RECAPTCHA_PUBLIC_KEY = os.environ['RECAPTCHA_PUBLIC_KEY']
-    RECAPTCHA_PRIVATE_KEY = os.environ['RECAPTCHA_PRIVATE_KEY']
+    RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY', 'RECAPTCHA_PUBLIC_KEY')
+    RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY', 'RECAPTCHA_PRIVATE_KEY')
     RECAPTCHA_DOMAIN = 'www.recaptcha.net'
 else:
     RECAPTCHA_PUBLIC_KEY = RECAPTCHA_PRIVATE_KEY = RECAPTCHA_DOMAIN = ''

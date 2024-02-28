@@ -1,0 +1,30 @@
+version: '3'
+
+networks:
+  direct_net:
+    external: true
+
+services:
+  flake8:
+    build:
+      context: ./
+      dockerfile: tests.Dockerfile
+    container_name: flake8
+    command: bash -c 'poetry run flake8 .'
+    volumes:
+      - .:/home/user/web
+    restart: always
+    networks:
+      - direct_net
+
+  tests:
+    build:
+      context: ./
+      dockerfile: tests.Dockerfile
+    container_name: tests
+    command: bash -c 'python3 manage.py test'
+    volumes:
+      - .:/home/user/web
+    restart: always
+    networks:
+      - direct_net
