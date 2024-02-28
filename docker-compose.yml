@@ -105,18 +105,6 @@ services:
     networks:
       - direct_net
 
-  tests:
-    build: .
-    container_name: tests
-    env_file:
-      - .env
-    command: bash -c 'python3 manage.py test'
-    volumes:
-      - .:/home/user/web
-    restart: always
-    networks:
-      - direct_net
-
   postgres:
     image: postgres:13
     container_name: postgres

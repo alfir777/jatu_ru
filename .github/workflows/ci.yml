@@ -9,30 +9,9 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
-      - name: Create env file
-        run: |
-          touch .env
-          echo SERVER_ROLE=${{ secrets.SERVER_ROLE }} >> .env
-          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
-          echo DOMAIN_NAME=${{ secrets.DOMAIN_NAME }} >> .env
-          echo DEBUG=${{ secrets.DEBUG }} >> .env
-          echo DJANGO_LOG_LEVEL=${{ secrets.DJANGO_LOG_LEVEL }} >> .env
-          echo DJANGO_LOG_FILE=${{ secrets.DJANGO_LOG_FILE }} >> .env
-          echo EMAIL_HOST=${{ secrets.EMAIL_HOST }} >> .env
-          echo EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }} >> .env
-          echo EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }} >> .env
-          echo EMAIL_SENDER=${{ secrets.EMAIL_SENDER }} >> .env
-          echo EMAIL_RECIPIEN=${{ secrets.EMAIL_RECIPIEN }} >> .env
-          echo TYPE_DATABASES=${{ secrets.TYPE_DATABASES }} >> .env
-          echo DATABASES_NAME=${{ secrets.DATABASES_NAME }} >> .env
-          echo DATABASES_USER=${{ secrets.DATABASES_USER }} >> .env
-          echo DATABASES_PASSWORD=${{ secrets.DATABASES_PASSWORD }} >> .env
-          echo DATABASES_HOST=${{ secrets.DATABASES_HOST }} >> .env
-          echo DATABASES_PORT=${{ secrets.DATABASES_PORT }} >> .env
-          echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
-          echo RECAPTCHA_PUBLIC_KEY=${{ secrets.RECAPTCHA_PUBLIC_KEY }} >> .env
-          echo RECAPTCHA_PRIVATE_KEY=${{ secrets.RECAPTCHA_PRIVATE_KEY }} >> .env
-          echo CLOUDFLARE_EMAIL=${{ secrets.CLOUDFLARE_EMAIL }} >> .env
-          echo CLOUDFLARE_API_KEY=${{ secrets.CLOUDFLARE_API_KEY }} >> .env
+      - name: Run flake8
+        run: docker compose -f docker-compose.tests.yml up --remove-orphans --exit-code-from flake8 flake8
       - name: Run tests
-        run: docker compose up --exit-code-from tests tests
+        run: docker compose -f docker-compose.tests.yml up --remove-orphans --exit-code-from tests tests
+      - name: Delete containers
+        run: docker compose -f docker-compose.tests.yml down
