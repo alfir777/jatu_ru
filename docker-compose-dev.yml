@@ -13,8 +13,6 @@ services:
     env_file:
       - .env
     command: bash -c 'while !</dev/tcp/postgres/5432; do sleep 1; done; gunicorn --bind 0.0.0.0:8000 config.wsgi'
-    volumes:
-      - .:/home/user/web
     restart: always
     ports:
       - '8010:8000'
@@ -46,7 +44,7 @@ services:
     env_file:
       - .env
     volumes:
-      - /storage/docker/volumes/postgres/data/db:/var/lib/postgresql/data
+      - ${DOCKERDIR_DB}:/var/lib/postgresql/data
     restart: always
     ports:
       - "5432:5432"
@@ -67,9 +65,9 @@ services:
       - .env
     restart: always
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./config/static:/static
-      - ./config/media:/media
+      - ${DOCKERDIR_APP}/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ${DOCKERDIR_APP}/config/static:/static
+      - ${DOCKERDIR_APP}/config/media:/media
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.static-http.entrypoints=https"      
