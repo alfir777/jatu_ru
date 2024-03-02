@@ -19,6 +19,8 @@ ENV PYTHONUNBUFFERED 1
 
 RUN pip install poetry &&  poetry config virtualenvs.create false && poetry install --no-dev
 
+COPY . $HOME/web/
+
 RUN chown -R user:user $USER_HOME
 
 RUN find $USER_HOME -type d -exec chmod 755 {} \;
