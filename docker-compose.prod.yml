@@ -24,7 +24,7 @@ services:
       - "traefik.http.routers.django-rtr.entrypoints=https"
       - "traefik.http.routers.django-rtr.rule=Host(`$DOMAIN_NAME`)"
       ## Middlewares
-      - "traefik.http.routers.django-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.django-rtr.middlewares=chain-web-no-auth@file"
       ## HTTP Services
       - "traefik.http.routers.django-rtr.service=django-svc"
       - "traefik.http.services.django-svc.loadbalancer.server.port=8000"

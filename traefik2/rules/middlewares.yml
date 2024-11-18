@@ -42,3 +42,15 @@ http:
         customResponseHeaders:
           X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex,"
           server: ""
+
+    middlewares-secure-headers-web:
+      headers:
+        hostsProxyHeaders:
+          - "X-Forwarded-Host"
+          - "X-Forwarded-For"
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true

@@ -12,3 +12,9 @@ http:
           - middlewares-rate-limit
           - middlewares-secure-headers
           - middlewares-basic-auth
+
+    chain-web-no-auth:
+      chain:
+        middlewares:
+          - middlewares-rate-limit
+          - middlewares-secure-headers-web
