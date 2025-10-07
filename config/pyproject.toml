@@ -1,6 +1,7 @@
 [tool.poetry]
 name = "blog"
 version = "0.2.0"
+package-mode = false
 description = "blog on Django"
 authors = ["Alfir Tyakin <alfir7777@gmail.com>"]
 
@@ -17,10 +18,11 @@ psycopg2-binary = "2.9.9"
 python-dotenv = "1.0.0"
 pytils = "0.4.1"
 sentry-sdk = "0.10.2"
+packaging = "25.0"
 
 [tool.poetry.group.dev.dependencies]
-flake8 = "6.1.0"
-flake8-import-order = "0.18.2"
+flake8 = "7.3.0"
+flake8-import-order = "0.19.2"
 django-debug-toolbar = "4.2.0"
 
 [build-system]
