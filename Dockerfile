@@ -1,4 +1,4 @@
-FROM python:3.9.13-slim-buster
+FROM python:3.9.13-slim-bullseye
 
 RUN apt-get update && apt-get upgrade -y && apt-get autoremove && apt-get autoclean
 
