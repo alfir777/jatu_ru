@@ -2,43 +2,64 @@ name: Continuous Deployment
 
 on:
   push:
-    branches: [ 'master' ]
+    branches: [ 'master', 'dev']
 
 jobs:
+  tests:
+    runs-on: self-hosted
+    env:
+      COMPOSE_PROJECT_NAME: blog-ci-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run flake8
+        run: docker compose --project-name "${COMPOSE_PROJECT_NAME}" -f docker-compose.tests.yml up --remove-orphans --exit-code-from flake8 flake8
+      - name: Run tests
+        run: docker compose --project-name "${COMPOSE_PROJECT_NAME}" -f docker-compose.tests.yml up --exit-code-from tests tests
+      - name: Delete containers
+        if: always()
+        run: docker compose --project-name "${COMPOSE_PROJECT_NAME}" -f docker-compose.tests.yml down --volumes --remove-orphans
+
   deploy:
     runs-on: self-hosted
+    environment: ${{ github.ref_name }}
+    env:
+      ENVIRONMENT: ${{ github.ref_name }}
+      ENV_FILE: .env.${{ github.ref_name }}
+      COMPOSE_PROJECT_NAME: blog-${{ github.ref_name }}
+      DOCKER_COMPOSE_FILE: docker-compose.${{ github.ref_name }}.yml
     steps:
       - uses: actions/checkout@v2
       - name: Create env file
         run: |
-          touch .env
-          echo DOCKERDIR_APP=${{ secrets.DOCKERDIR_APP }} >> .env
-          echo DOCKERDIR_DB=${{ secrets.DOCKERDIR_DB }} >> .env
-          echo SERVER_ROLE=${{ secrets.SERVER_ROLE }} >> .env
-          echo LOGGING_ON=${{ secrets.LOGGING_ON }} >> .env
-          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
-          echo DOMAIN_NAME=${{ secrets.DOMAIN_NAME }} >> .env
-          echo DEBUG=${{ secrets.DEBUG }} >> .env
-          echo DJANGO_LOG_LEVEL=${{ secrets.DJANGO_LOG_LEVEL }} >> .env
-          echo DJANGO_LOG_FILE=${{ secrets.DJANGO_LOG_FILE }} >> .env
-          echo EMAIL_HOST=${{ secrets.EMAIL_HOST }} >> .env
-          echo EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }} >> .env
-          echo EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }} >> .env
-          echo EMAIL_SENDER=${{ secrets.EMAIL_SENDER }} >> .env
-          echo EMAIL_RECIPIEN=${{ secrets.EMAIL_RECIPIEN }} >> .env
-          echo TYPE_DATABASES=${{ secrets.TYPE_DATABASES }} >> .env
-          echo DATABASES_NAME=${{ secrets.DATABASES_NAME }} >> .env
-          echo DATABASES_USER=${{ secrets.DATABASES_USER }} >> .env
-          echo DATABASES_PASSWORD=${{ secrets.DATABASES_PASSWORD }} >> .env
-          echo DATABASES_HOST=${{ secrets.DATABASES_HOST }} >> .env
-          echo DATABASES_PORT=${{ secrets.DATABASES_PORT }} >> .env
-          echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
-          echo RECAPTCHA_PUBLIC_KEY=${{ secrets.RECAPTCHA_PUBLIC_KEY }} >> .env
-          echo RECAPTCHA_PRIVATE_KEY=${{ secrets.RECAPTCHA_PRIVATE_KEY }} >> .env
-          echo CLOUDFLARE_EMAIL=${{ secrets.CLOUDFLARE_EMAIL }} >> .env
-          echo CLOUDFLARE_API_KEY=${{ secrets.CLOUDFLARE_API_KEY }} >> .env
-          echo SENTRY_SDK_DSN=${{ secrets.SENTRY_SDK_DSN }} >> .env
+          rm -f "${ENV_FILE}"
+          touch "${ENV_FILE}"
+          echo DOCKERDIR_APP=${{ secrets.DOCKERDIR_APP }} >> "${ENV_FILE}"
+          echo DOCKERDIR_DB=${{ secrets.DOCKERDIR_DB }} >> "${ENV_FILE}"
+          echo SERVER_ROLE=${{ secrets.SERVER_ROLE }} >> "${ENV_FILE}"
+          echo LOGGING_ON=${{ secrets.LOGGING_ON }} >> "${ENV_FILE}"
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> "${ENV_FILE}"
+          echo DOMAIN_NAME=${{ secrets.DOMAIN_NAME }} >> "${ENV_FILE}"
+          echo DEBUG=${{ secrets.DEBUG }} >> "${ENV_FILE}"
+          echo DJANGO_LOG_LEVEL=${{ secrets.DJANGO_LOG_LEVEL }} >> "${ENV_FILE}"
+          echo DJANGO_LOG_FILE=${{ secrets.DJANGO_LOG_FILE }} >> "${ENV_FILE}"
+          echo EMAIL_HOST=${{ secrets.EMAIL_HOST }} >> "${ENV_FILE}"
+          echo EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }} >> "${ENV_FILE}"
+          echo EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }} >> "${ENV_FILE}"
+          echo EMAIL_SENDER=${{ secrets.EMAIL_SENDER }} >> "${ENV_FILE}"
+          echo EMAIL_RECIPIEN=${{ secrets.EMAIL_RECIPIEN }} >> "${ENV_FILE}"
+          echo TYPE_DATABASES=${{ secrets.TYPE_DATABASES }} >> "${ENV_FILE}"
+          echo DATABASES_NAME=${{ secrets.DATABASES_NAME }} >> "${ENV_FILE}"
+          echo DATABASES_USER=${{ secrets.DATABASES_USER }} >> "${ENV_FILE}"
+          echo DATABASES_PASSWORD=${{ secrets.DATABASES_PASSWORD }} >> "${ENV_FILE}"
+          echo DATABASES_HOST=${{ secrets.DATABASES_HOST }} >> "${ENV_FILE}"
+          echo DATABASES_PORT=${{ secrets.DATABASES_PORT }} >> "${ENV_FILE}"
+          echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> "${ENV_FILE}"
+          echo RECAPTCHA_PUBLIC_KEY=${{ secrets.RECAPTCHA_PUBLIC_KEY }} >> "${ENV_FILE}"
+          echo RECAPTCHA_PRIVATE_KEY=${{ secrets.RECAPTCHA_PRIVATE_KEY }} >> "${ENV_FILE}"
+          echo CLOUDFLARE_EMAIL=${{ secrets.CLOUDFLARE_EMAIL }} >> "${ENV_FILE}"
+          echo CLOUDFLARE_API_KEY=${{ secrets.CLOUDFLARE_API_KEY }} >> "${ENV_FILE}"
+          echo SENTRY_SDK_DSN=${{ secrets.SENTRY_SDK_DSN }} >> "${ENV_FILE}"
       - name: Run build
-        run: docker compose -f docker-compose.prod.yml build
+        run: docker compose --project-name "${COMPOSE_PROJECT_NAME}" --env-file "${ENV_FILE}" -f "${DOCKER_COMPOSE_FILE}" build
       - name: Run deploy
-        run: docker compose -f docker-compose.prod.yml up --remove-orphans -d
+        run: docker compose --project-name "${COMPOSE_PROJECT_NAME}" --env-file "${ENV_FILE}" -f "${DOCKER_COMPOSE_FILE}" up --remove-orphans -d
