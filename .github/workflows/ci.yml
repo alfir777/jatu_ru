@@ -2,16 +2,21 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [ '**' ]
+    branches-ignore:
+      - master
+      - dev
 
 jobs:
   tests:
     runs-on: self-hosted
+    env:
+      COMPOSE_PROJECT_NAME: blog-ci-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v2
       - name: Run flake8
-        run: docker compose -f docker-compose.tests.yml up --remove-orphans --exit-code-from flake8 flake8
+        run: docker compose --project-name "${COMPOSE_PROJECT_NAME}" -f docker-compose.tests.yml up --remove-orphans --exit-code-from flake8 flake8
       - name: Run tests
-        run: docker compose -f docker-compose.tests.yml up --remove-orphans --exit-code-from tests tests
+        run: docker compose --project-name "${COMPOSE_PROJECT_NAME}" -f docker-compose.tests.yml up --exit-code-from tests tests
       - name: Delete containers
-        run: docker compose -f docker-compose.tests.yml down
+        if: always()
+        run: docker compose --project-name "${COMPOSE_PROJECT_NAME}" -f docker-compose.tests.yml down --volumes --remove-orphans
