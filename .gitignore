@@ -1,9 +1,9 @@
 /.idea/
 /env/
 /venv/
-/config/static/
+/src/static/
 /data/db/
-/config/media/
+/src/media/
 __pycache__
 *.log
 .env
