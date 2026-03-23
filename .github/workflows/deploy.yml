@@ -1,4 +1,4 @@
-name: Continuous Deployment
+name: CI/CD
 
 on:
   push:
@@ -11,8 +11,8 @@ jobs:
       COMPOSE_PROJECT_NAME: blog-ci-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v2
-      - name: Run flake8
-        run: docker compose --project-name "${COMPOSE_PROJECT_NAME}" -f docker-compose.tests.yml up --remove-orphans --exit-code-from flake8 flake8
+      - name: Run pre-commit
+        run: pre-commit run --all-files
       - name: Run tests
         run: docker compose --project-name "${COMPOSE_PROJECT_NAME}" -f docker-compose.tests.yml up --exit-code-from tests tests
       - name: Delete containers
@@ -20,6 +20,7 @@ jobs:
         run: docker compose --project-name "${COMPOSE_PROJECT_NAME}" -f docker-compose.tests.yml down --volumes --remove-orphans
 
   deploy:
+    needs: tests
     runs-on: self-hosted
     environment: ${{ github.ref_name }}
     env:

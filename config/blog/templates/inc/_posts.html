@@ -45,13 +45,11 @@
                                     </span>
                                     <span class="comments-type">
                                         <i class="bi bi-folder"></i>
-                                        {% if post.tags.exists %}
-                                            {% for tag in post.tags.all %}
-                                            <a href="{{ tag.get_absolute_url }}">{{ tag.title }}</a>
-                                            {% endfor %}
-                                        {% else %}
-                                            Нет тегов
-                                        {% endif %}
+                                        {% for tag in post.tags.all %}
+                                        <a href="{{ tag.get_absolute_url }}">{{ tag.title }}</a>
+                                        {% empty %}
+                                        Нет тегов
+                                        {% endfor %}
                                     </span>
                                     <span class="comments-type">
                                         <i class="bi bi-tags"></i>

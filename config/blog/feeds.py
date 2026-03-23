@@ -6,12 +6,12 @@ from .models import Post
 
 
 class LatestPostsFeed(Feed):
-    title = 'RRS-лента'
-    link = '/blog/'
-    description = 'Самые свежие посты'
+    title = "RRS-лента"
+    link = "/blog/"
+    description = "Самые свежие посты"
 
     def items(self) -> QuerySet:
-        return Post.objects.filter(is_published=True).order_by('-created_at')[:10]
+        return Post.objects.filter(is_published=True).order_by("-created_at")[:10]
 
     def item_title(self, item: Post) -> str:
         return item.title
@@ -20,4 +20,4 @@ class LatestPostsFeed(Feed):
         return item.description
 
     def item_link(self, item: Post) -> str:
-        return reverse('post', kwargs={'slug': item.slug})
+        return reverse("post", kwargs={"slug": item.slug})

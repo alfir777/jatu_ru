@@ -61,7 +61,7 @@ services:
       - ${DOCKERDIR_APP}/config/media:/media
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.static-http.entrypoints=https"      
+      - "traefik.http.routers.static-http.entrypoints=https"
       - "traefik.http.routers.static-http.rule=Host(`${DOMAIN_NAME}`) && PathPrefix(`/static`,`/media`)"
     networks:
       - direct_net

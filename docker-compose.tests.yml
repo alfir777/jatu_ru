@@ -3,17 +3,6 @@ networks:
     external: true
 
 services:
-  flake8:
-    build:
-      context: ./
-      dockerfile: tests.Dockerfile
-    command: bash -c 'poetry run flake8 .'
-    volumes:
-      - .:/home/user/web
-    restart: always
-    networks:
-      - direct_net
-
   tests:
     build:
       context: ./
