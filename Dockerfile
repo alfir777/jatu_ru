@@ -2,16 +2,16 @@ FROM python:3.9.13-slim-bullseye
 
 RUN apt-get update && apt-get upgrade -y && apt-get autoremove && apt-get autoclean
 
-RUN mkdir -p /home/user/web/config
+RUN mkdir -p /home/user/web/src
 
 RUN addgroup --system --gid 2000 user && adduser --system --uid 2000 user
 
 ENV HOME=/home/user
-ENV USER_HOME=/home/user/web/config
+ENV USER_HOME=/home/user/web/src
 WORKDIR $USER_HOME
 
-COPY ./config/pyproject.toml $USER_HOME/pyproject.toml
-COPY ./config/poetry.lock $USER_HOME/poetry.lock
+COPY ./src/pyproject.toml $USER_HOME/pyproject.toml
+COPY ./src/poetry.lock $USER_HOME/poetry.lock
 
 # set env variables
 ENV PYTHONDONTWRITEBYTECODE 1
