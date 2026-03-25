@@ -2,10 +2,10 @@ from django.contrib.sitemaps.views import sitemap
 from django.urls import path
 from rest_framework import routers
 
-from .api import PostViewSet
-from .feeds import LatestPostsFeed
-from .sitemap import PostSitemap
-from .views import (
+from blog.api import PostViewSet
+from blog.feeds import LatestPostsFeed
+from blog.sitemap import PostSitemap
+from blog.views import (
     BlogByCategory,
     BlogByTag,
     BlogCreateView,

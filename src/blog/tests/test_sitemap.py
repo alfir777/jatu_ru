@@ -11,7 +11,7 @@ NUMBER_OF_ITEMS = 50
 
 class PostSitemapTests(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls) -> None:
         test_user = User.objects.create_user("user", password="password")
         test_user.save()
         test_category = Category.objects.create(title="Test", slug="Test")
@@ -25,7 +25,7 @@ class PostSitemapTests(TestCase):
                 category_id=test_category.id,
             )
 
-    def test_get(self):
+    def test_get(self) -> None:
         response = self.client.get("/sitemap.xml")
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -39,18 +39,18 @@ class PostSitemapTests(TestCase):
             'xmlns:xhtml="http://www.w3.org/1999/xhtml">',
         )
 
-    def test_post_ok(self):
+    def test_post_ok(self) -> None:
         response = self.client.post("/sitemap.xml")
 
         self.assertEqual(HTTPStatus.OK, response.status_code)
 
-    def test_items(self):
+    def test_items(self) -> None:
         response = self.client.get("/sitemap.xml")
         parsed_xml = parseString(response.content)
         url_tags = parsed_xml.getElementsByTagName("url")
         self.assertEqual(len(url_tags), NUMBER_OF_ITEMS)
 
-    def test_lastmod(self):
+    def test_lastmod(self) -> None:
         response = self.client.get("/sitemap.xml")
         parsed_xml = parseString(response.content)
         lastmod_tags = parsed_xml.getElementsByTagName("lastmod")

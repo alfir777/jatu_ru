@@ -13,7 +13,7 @@ NUMBER_OF_ITEMS = 10
 
 class BlogTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls) -> None:
         test_user = User.objects.create_user("user", password="password")
         test_user.save()
         test_category = Category.objects.create(title="Test", slug="Test")
@@ -27,22 +27,22 @@ class BlogTest(TestCase):
                 category_id=test_category.id,
             )
 
-    def test_blog_url_exists_at_desired_location(self):
+    def test_blog_url_exists_at_desired_location(self) -> None:
         response = self.client.get("/blog/")
         self.assertEqual(response.status_code, 200)
 
-    def test_blog_uses_correct_template(self):
+    def test_blog_uses_correct_template(self) -> None:
         response = self.client.get(reverse("blog"))
         self.assertTemplateUsed(response, "blog/blog.html")
 
-    def test_post_list_view(self):
+    def test_post_list_view(self) -> None:
         response = self.client.get(reverse("blog"))
         self.assertContains(response, "title 1")
 
 
 class PostByCategoryTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls) -> None:
         test_user = User.objects.create_user("user", password="password")
         test_user.save()
         test_category = Category.objects.create(
@@ -58,26 +58,26 @@ class PostByCategoryTest(TestCase):
                 category_id=test_category.id,
             )
 
-    def test_post_by_category_url_exists_at_desired_location(self):
+    def test_post_by_category_url_exists_at_desired_location(self) -> None:
         response = self.client.get("/blog/category/test_category")
         self.assertEqual(response.status_code, 200)
 
-    def test_post_by_category_uses_correct_template(self):
+    def test_post_by_category_uses_correct_template(self) -> None:
         response = self.client.get("/blog/category/test_category")
         self.assertTemplateUsed(response, "blog/category.html")
 
-    def test_post_by_category_list_view(self):
+    def test_post_by_category_list_view(self) -> None:
         response = self.client.get("/blog/category/test_category")
         self.assertContains(response, "title 1")
 
 
 class ContactTest(TestCase):
 
-    def test_contact_url_exists_at_desired_location(self):
+    def test_contact_url_exists_at_desired_location(self) -> None:
         response = self.client.get("/contact/")
         self.assertEqual(response.status_code, 200)
 
-    def test_contact_uses_correct_template(self):
+    def test_contact_uses_correct_template(self) -> None:
         response = self.client.get(reverse("contact"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "blog/contact.html")
@@ -85,11 +85,11 @@ class ContactTest(TestCase):
 
 class IndexTest(TestCase):
 
-    def test_index_url_exists_at_desired_location(self):
+    def test_index_url_exists_at_desired_location(self) -> None:
         response = self.client.get("")
         self.assertEqual(response.status_code, 200)
 
-    def test_index_uses_correct_template(self):
+    def test_index_uses_correct_template(self) -> None:
         response = self.client.get(reverse("home"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "blog/index.html")
@@ -97,16 +97,16 @@ class IndexTest(TestCase):
 
 class RestorePasswordTest(TestCase):
 
-    def test_restore_password_url_exists_at_desired_location(self):
+    def test_restore_password_url_exists_at_desired_location(self) -> None:
         response = self.client.get("/restore_password/")
         self.assertEqual(response.status_code, 200)
 
-    def test_restore_password_uses_correct_template(self):
+    def test_restore_password_uses_correct_template(self) -> None:
         response = self.client.get(reverse("restore_password"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "blog/restore_password.html")
 
-    def test_post_restore_password(self):
+    def test_post_restore_password(self) -> None:
         _ = User.objects.create(username="test", email=USER_EMAIL)
         response = self.client.post(reverse("restore_password"), {"email": USER_EMAIL})
         self.assertEqual(response.status_code, 200)
@@ -115,7 +115,7 @@ class RestorePasswordTest(TestCase):
         self.assertEqual(len(outbox), 1)
         self.assertIn(USER_EMAIL, outbox[0].to)
 
-    def test_if_password_was_changed(self):
+    def test_if_password_was_changed(self) -> None:
         user = User.objects.create(username="test", email=USER_EMAIL)
         user.set_password(OLD_PASSWORD)
         user.save()
@@ -127,7 +127,7 @@ class RestorePasswordTest(TestCase):
 
 
 class RobotsTxtTests(TestCase):
-    def test_get(self):
+    def test_get(self) -> None:
         response = self.client.get("/robots.txt")
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -136,7 +136,7 @@ class RobotsTxtTests(TestCase):
         lines = response.content.decode().splitlines()
         self.assertEqual(lines[0], "User-Agent: *")
 
-    def test_post_disallowed(self):
+    def test_post_disallowed(self) -> None:
         response = self.client.post("/robots.txt")
 
         self.assertEqual(HTTPStatus.METHOD_NOT_ALLOWED, response.status_code)

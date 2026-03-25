@@ -2,7 +2,8 @@ from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django import forms
 from django.contrib import admin
 from django.db import models
-from django.forms import CheckboxSelectMultiple
+from django.forms import CheckboxSelectMultiple, ModelForm
+from django.http import HttpRequest
 from django.utils.safestring import mark_safe
 
 from blog.models import Category, Comment, Post, Tag
@@ -57,13 +58,19 @@ class PostAdmin(admin.ModelAdmin):
         models.ManyToManyField: {"widget": CheckboxSelectMultiple},
     }
 
-    def get_photo(self, obj):
+    def get_photo(self, obj: models.Model) -> str:
         if obj.photo:
             return mark_safe(f'<img src="{obj.photo.url}" width="50">')
         else:
             return "-"
 
-    def save_model(self, request, obj, form, change):
+    def save_model(
+        self,
+        request: HttpRequest,
+        obj: models.Model,
+        form: ModelForm,
+        change: bool,
+    ) -> None:
         if form.is_valid():
             obj.author = request.user
             obj.save()
@@ -80,10 +87,26 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class CommentAdmin(admin.ModelAdmin):
-    form = PostAdminForm
     readonly_fields = ("author", "votes", "created_at", "updated_at")
+    list_display = (
+        "id",
+        "post",
+        "author",
+        "content",
+        "created_at",
+        "updated_at",
+        "votes",
+        "is_published",
+        "parent",
+    )
 
-    def save_model(self, request, obj, form, change):
+    def save_model(
+        self,
+        request: HttpRequest,
+        obj: models.Model,
+        form: ModelForm,
+        change: bool,
+    ) -> None:
         if form.is_valid():
             obj.author = request.user
             obj.save()
