@@ -4,6 +4,9 @@ from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
+from django.db.models import Model
+from django.forms import ModelForm
+from django.http import HttpRequest
 
 from blog.models import Category, Comment, Post, Tag
 from config.settings import SERVER_ROLE
@@ -129,7 +132,6 @@ class RestorePasswordForm(forms.Form):
 
 
 class UserCommentForm(forms.Form):
-    form = BlogForm
     content = forms.CharField(
         label="Текст", widget=forms.Textarea(attrs={"class": "form-control", "rows": 5})
     )
@@ -140,7 +142,12 @@ class UserCommentForm(forms.Form):
         widgets = {"form": forms.HiddenInput()}
         fields = ("content", "author_id")
 
-    def save(self, request, obj, form):
+    def save_model(
+        self,
+        request: HttpRequest,
+        obj: Model,
+        form: ModelForm,
+    ) -> None:
         if form.is_valid():
             obj.author = request.user
             obj.save()
@@ -148,7 +155,6 @@ class UserCommentForm(forms.Form):
 
 # TODO Реализовать возможность добавления комментариев без авторизации
 class GuestCommentForm(forms.Form):
-    form = BlogForm
     content = forms.CharField(
         label="Текст", widget=forms.Textarea(attrs={"class": "form-control", "rows": 5})
     )
@@ -159,7 +165,12 @@ class GuestCommentForm(forms.Form):
         widgets = {"post": forms.HiddenInput}
         fields = ("content", "author_id")
 
-    def save(self, request, obj, form):
+    def save_model(
+        self,
+        request: HttpRequest,
+        obj: Model,
+        form: ModelForm,
+    ) -> None:
         if form.is_valid():
             obj.author = request.user
             obj.save()

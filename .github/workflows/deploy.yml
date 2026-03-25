@@ -47,7 +47,7 @@ jobs:
           echo EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }} >> "${ENV_FILE}"
           echo EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }} >> "${ENV_FILE}"
           echo EMAIL_SENDER=${{ secrets.EMAIL_SENDER }} >> "${ENV_FILE}"
-          echo EMAIL_RECIPIEN=${{ secrets.EMAIL_RECIPIEN }} >> "${ENV_FILE}"
+          echo EMAIL_RECIPIENT=${{ secrets.EMAIL_RECIPIENT }} >> "${ENV_FILE}"
           echo TYPE_DATABASES=${{ secrets.TYPE_DATABASES }} >> "${ENV_FILE}"
           echo DATABASES_NAME=${{ secrets.DATABASES_NAME }} >> "${ENV_FILE}"
           echo DATABASES_USER=${{ secrets.DATABASES_USER }} >> "${ENV_FILE}"

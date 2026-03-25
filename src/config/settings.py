@@ -36,70 +36,41 @@ SERVER_ROLE = os.environ.get(
 )  # develop, staging, production
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if os.environ.get("DEBUG", "True") == "True":
-    DEBUG = True
-    # Application definition
-    # development
-    INSTALLED_APPS = [
-        "django.contrib.admin",
-        "django.contrib.auth",
-        "django.contrib.contenttypes",
-        "django.contrib.sessions",
-        "django.contrib.messages",
-        "django.contrib.staticfiles",
-        "django.contrib.sitemaps",
-        "django.contrib.sites",
-        "debug_toolbar",
-        "captcha",
-        "ckeditor",
-        "ckeditor_uploader",
-        "rest_framework",
-        "blog.apps.BlogConfig",
-    ]
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-    MIDDLEWARE = [
-        "django.middleware.security.SecurityMiddleware",
-        "django.contrib.sessions.middleware.SessionMiddleware",
-        "django.middleware.common.CommonMiddleware",
-        "django.middleware.csrf.CsrfViewMiddleware",
-        "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "django.contrib.messages.middleware.MessageMiddleware",
-        "django.middleware.clickjacking.XFrameOptionsMiddleware",
-        "debug_toolbar.middleware.DebugToolbarMiddleware",
-    ]
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sitemaps",
+    "django.contrib.sites",
+    "captcha",
+    "ckeditor",
+    "ckeditor_uploader",
+    "rest_framework",
+    "blog.apps.BlogConfig",
+]
 
-elif os.environ.get("DEBUG", "True") == "False":
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+if DEBUG:
+    INSTALLED_APPS.append("debug_toolbar")
+    MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
+else:
     CSRF_TRUSTED_ORIGINS = [
         f"https://{DOMAIN_NAME.lower()}",
         f"https://www.{DOMAIN_NAME.lower()}",
-    ]
-    DEBUG = False
-    # Application definition
-
-    INSTALLED_APPS = [
-        "django.contrib.admin",
-        "django.contrib.auth",
-        "django.contrib.contenttypes",
-        "django.contrib.sessions",
-        "django.contrib.messages",
-        "django.contrib.staticfiles",
-        "django.contrib.sitemaps",
-        "django.contrib.sites",
-        "captcha",
-        "ckeditor",
-        "ckeditor_uploader",
-        "rest_framework",
-        "blog.apps.BlogConfig",
-    ]
-
-    MIDDLEWARE = [
-        "django.middleware.security.SecurityMiddleware",
-        "django.contrib.sessions.middleware.SessionMiddleware",
-        "django.middleware.common.CommonMiddleware",
-        "django.middleware.csrf.CsrfViewMiddleware",
-        "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "django.contrib.messages.middleware.MessageMiddleware",
-        "django.middleware.clickjacking.XFrameOptionsMiddleware",
     ]
 
     if os.environ.get("LOGGING_ON"):
@@ -233,7 +204,7 @@ EMAIL_USER_SSL = True
 EMAIL_BACKEND = "django_smtp_ssl.SSLEmailBackend"
 
 EMAIL_SENDER = os.environ.get("EMAIL_SENDER", "noreply@example.com")
-EMAIL_RECIPIEN = os.environ.get("EMAIL_RECIPIEN", "user@example.com")
+EMAIL_RECIPIENT = os.environ.get("EMAIL_RECIPIENT", "user@example.com")
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 

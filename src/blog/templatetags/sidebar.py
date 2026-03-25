@@ -1,3 +1,5 @@
+from typing import Any
+
 from django import template
 
 from blog.models import Post, Tag
@@ -6,12 +8,12 @@ register = template.Library()
 
 
 @register.inclusion_tag("blog/popular_posts_tpl.html")
-def get_popular(cnt=3):
+def get_popular(cnt: int = 3) -> dict[str, Any]:
     posts = Post.objects.order_by("-views")[:cnt].select_related("category", "author")
     return {"posts": posts}
 
 
 @register.inclusion_tag("blog/tags_tpl.html")
-def get_list_tags():
+def get_list_tags() -> dict[str, Any]:
     tags = Tag.objects.all()
     return {"tags": tags}
