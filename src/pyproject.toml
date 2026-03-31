@@ -6,7 +6,7 @@ description = "blog on Django"
 authors = ["Alfir Tyakin <alfir7777@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "3.9.13"
+python = "3.12.10"
 Django = "4.2.7"
 django-ckeditor = "6.7.0"
 django-recaptcha = "3.0.0"
