@@ -1,23 +1,19 @@
 from typing import Any
 
 from django.contrib import messages
-from django.contrib.auth import get_user
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import F, QuerySet
+from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
-from django.utils.text import slugify
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from blog.forms import (
-    BlogForm,
-    GuestCommentForm,
-    UserCommentForm,
-)
+from blog.container import comment_service, post_service
+from blog.exceptions import DuplicatePostTitleError, UnauthorizedError
+from blog.forms import BlogForm, UserCommentForm
 from blog.mixins import LogoNameMixin
-from blog.models import Category, Comment, Post, Tag
+from blog.models import Post
 from config.settings import DOMAIN_NAME
 
 
@@ -26,17 +22,13 @@ class BlogListView(LogoNameMixin, ListView):
     template_name = "blog/blog.html"
     paginate_by = 10
 
-    def get_context_data(self, *, object_list=None, **kwargs: Any):
+    def get_queryset(self) -> QuerySet[Post]:
+        return post_service.get_published_posts()
+
+    def get_context_data(self, *, object_list=None, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context.update(self.get_user_context(title=f"{DOMAIN_NAME} | Блог"))
         return context
-
-    def get_queryset(self) -> QuerySet[Post]:
-        return (
-            Post.objects.filter(is_published=True)
-            .select_related("category", "author")
-            .prefetch_related("tags")
-        )
 
 
 class BlogByCategory(LogoNameMixin, ListView):
@@ -45,19 +37,12 @@ class BlogByCategory(LogoNameMixin, ListView):
     allow_empty = False
 
     def get_queryset(self) -> QuerySet[Post]:
-        return (
-            Post.objects.filter(category__slug=self.kwargs["slug"], is_published=True)
-            .select_related("category", "author")
-            .prefetch_related("tags")
-        )
+        return post_service.get_posts_by_category(self.kwargs["slug"])
 
-    def get_context_data(self, *, object_list=None, **kwargs: Any):
+    def get_context_data(self, *, object_list=None, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context.update(
-            self.get_user_context(
-                title=f'{DOMAIN_NAME} | {str(Category.objects.get(slug=self.kwargs["slug"]))}'
-            )
-        )
+        category_title = post_service.get_category_title(self.kwargs["slug"])
+        context.update(self.get_user_context(title=f"{DOMAIN_NAME} | {category_title}"))
         return context
 
 
@@ -67,19 +52,12 @@ class BlogByTag(LogoNameMixin, ListView):
     allow_empty = False
 
     def get_queryset(self) -> QuerySet[Post]:
-        return (
-            Post.objects.filter(tags__slug=self.kwargs["slug"], is_published=True)
-            .select_related("category", "author")
-            .prefetch_related("tags")
-        )
+        return post_service.get_posts_by_tag(self.kwargs["slug"])
 
-    def get_context_data(self, *, object_list=None, **kwargs: Any):
+    def get_context_data(self, *, object_list=None, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context.update(
-            self.get_user_context(
-                title=f'{DOMAIN_NAME} | {Tag.objects.get(slug=self.kwargs["slug"])}'
-            )
-        )
+        tag_title = post_service.get_tag_title(self.kwargs["slug"])
+        context.update(self.get_user_context(title=f"{DOMAIN_NAME} | {tag_title}"))
         return context
 
 
@@ -88,48 +66,38 @@ class BlogDetailView(DetailView):
     template_name = "blog/blog_detail.html"
     context_object_name = "post"
 
-    def get(self, request: HttpRequest, *args, **kwargs: Any) -> HttpResponse:
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         response = super().get(request, *args, **kwargs)
-        Post.objects.filter(pk=self.object.pk).update(views=F("views") + 1)
-        self.object.refresh_from_db(fields=["views"])
+        post_service.increment_views(self.object.pk)
         return response
 
-    def get_context_data(self, *, object_list=None, **kwargs: Any):
+    def get_context_data(self, *, object_list=None, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        comments = (
-            Comment.objects.filter(post=self.object, is_published=True)
-            .order_by("created_at")
-            .select_related("post", "author", "parent")
-        )
+        comments = comment_service.get_comments_for_post(self.object)
         context["comment_count"] = comments.count()
         context["comments"] = comments
-        for comment in comments:
-            comment._post_url = self.object.get_absolute_url()
-        context["form"] = UserCommentForm(initial={"post": self.object.slug})
+        context["form"] = UserCommentForm()
         context["description"] = self.object.description
         context["title"] = f"{DOMAIN_NAME} | {self.object.title}"
         context["logo_name"] = DOMAIN_NAME
         return context
 
-    def post(self, request: HttpRequest, *args, **kwargs: Any) -> HttpResponse:
-        post = self.get_object()
-        if request.user.is_authenticated:
-            form = UserCommentForm(request.POST)
-        else:
-            form = GuestCommentForm(request.POST)
-        if form.is_valid():
-            form.cleaned_data["author"] = get_user(request)
-            form.cleaned_data["post_id"] = post.pk
-            Comment.objects.create(**form.cleaned_data)
-            messages.add_message(
-                request, messages.SUCCESS, "Комментарий добавлен (на модерации)"
-            )
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        post = post_service.get_post_by_slug(self.kwargs["slug"])
+        if not request.user.is_authenticated:
+            messages.warning(request, "Нет прав на добавление комментария")
             return redirect(post)
-        else:
-            messages.add_message(
-                request, messages.WARNING, "Нет прав на добавления комментария"
+        form = UserCommentForm(request.POST)
+        if form.is_valid():
+            comment_service.add_comment(
+                post=post,
+                author=request.user,
+                content=form.cleaned_data["content"],
             )
-            return redirect(self.object)
+            messages.success(request, "Комментарий добавлен (на модерации)")
+            return redirect(post)
+        messages.warning(request, "Ошибка при добавлении комментария")
+        return redirect(post)
 
 
 class BlogCreateView(LoginRequiredMixin, CreateView):
@@ -138,34 +106,30 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
     login_url = "/login/"
     redirect_field_name = "/blog/"
 
-    def post(self, request: HttpRequest, *args, **kwargs: Any) -> HttpResponse:
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["title"] = f"{DOMAIN_NAME} | Добавление поста"
+        context["logo_name"] = DOMAIN_NAME
+        return context
+
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         form = BlogForm(request.POST)
-        if form.is_valid() and request.user.is_staff:
-            if Post.objects.filter(slug=slugify(form.cleaned_data["title"])).exists():
+        if form.is_valid():
+            try:
+                post = post_service.create_post(
+                    user=request.user,
+                    title=form.cleaned_data["title"],
+                    description=form.cleaned_data["description"],
+                    content=form.cleaned_data["content"],
+                    is_published=form.cleaned_data["is_published"],
+                    category=form.cleaned_data["category"],
+                    tags=request.POST.getlist("tags"),
+                )
+                return redirect(post)
+            except UnauthorizedError:
+                messages.warning(request, "Нет прав на добавление поста")
+            except DuplicatePostTitleError:
                 messages.error(request, "Название поста должно быть уникальным")
-                context = {
-                    "form": form,
-                    "title": f"{DOMAIN_NAME} | Добавление поста",
-                    "logo_name": DOMAIN_NAME,
-                }
-                return render(request, "blog/blog_post_add.html", context=context)
-            post = Post(
-                title=form.cleaned_data["title"],
-                author=request.user,
-                description=form.cleaned_data["description"],
-            )
-            post.content = form.cleaned_data["content"]
-            post.is_published = form.cleaned_data["is_published"]
-            post.category = form.cleaned_data["category"]
-            post.save()
-            tags = request.POST.getlist("tags")
-            if tags:
-                post.tags.set(tags)
-            return redirect(post)
-        elif form.is_valid() and not request.user.is_staff:
-            messages.add_message(
-                request, messages.WARNING, "Нет прав на добавление поста"
-            )
         context = {
             "form": form,
             "title": f"{DOMAIN_NAME} | Добавление поста",
@@ -181,29 +145,32 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
     login_url = "/login/"
     redirect_field_name = "/blog/"
 
-    def get_object(self, *args, **kwargs) -> Post:
-        return Post.objects.get(slug=self.kwargs["slug"])
+    def get_object(self, *args: Any, **kwargs: Any) -> Post:
+        return post_service.get_post_by_slug(self.kwargs["slug"])
 
-    def post(self, request: HttpRequest, *args, **kwargs: Any) -> HttpResponse:
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["title"] = f"{DOMAIN_NAME} | Редактирование поста"
+        context["logo_name"] = DOMAIN_NAME
+        return context
+
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         form = BlogForm(request.POST)
-        if form.is_valid() and request.user.is_staff:
-            post = Post.objects.get(slug=self.kwargs["slug"])
-            if get_user(request) != post.author:
-                messages.error(request, "Изменить пост имеет право только автор поста")
+        if form.is_valid():
+            try:
+                post = post_service.update_post(
+                    slug=self.kwargs["slug"],
+                    user=request.user,
+                    title=form.cleaned_data["title"],
+                    description=form.cleaned_data["description"],
+                    content=form.cleaned_data["content"],
+                    is_published=form.cleaned_data["is_published"],
+                    category=form.cleaned_data["category"],
+                    tags=request.POST.getlist("tags"),
+                )
                 return redirect(post)
-            post.title = form.cleaned_data["title"]
-            post.description = form.cleaned_data["description"]
-            post.content = form.cleaned_data["content"]
-            post.is_published = form.cleaned_data["is_published"]
-            post.category = form.cleaned_data["category"]
-            tags = request.POST.getlist("tags")
-            post.tags.set(tags)
-            post.save()
-            return redirect(post)
-        elif form.is_valid() and not request.user.is_staff:
-            messages.add_message(
-                request, messages.WARNING, "Нет прав на изменение поста"
-            )
+            except UnauthorizedError as exc:
+                messages.warning(request, str(exc))
         context = {
             "form": form,
             "title": f"{DOMAIN_NAME} | Редактирование поста",
@@ -216,17 +183,20 @@ class BlogDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = "blog/blog_post_delete.html"
     success_url = reverse_lazy("blog")
-    success_message = "Пост был успешно удален."
 
-    def get(self, request: HttpRequest, *args, **kwargs: Any) -> HttpResponse:
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         post = self.get_object()
-        if post.author != self.request.user:
+        if post.author != request.user:
             messages.error(
                 request, "Пост может удалить только автор поста или администратор"
             )
             return redirect(self.success_url)
         return render(request, "blog/blog_post_delete.html", {"title": post.title})
 
-    def delete(self, request: HttpRequest, *args, **kwargs: Any) -> HttpResponse:
-        messages.success(self.request, self.success_message)
-        return super().delete(request, *args, **kwargs)
+    def delete(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        try:
+            post_service.delete_post(slug=self.kwargs["slug"], user=request.user)
+            messages.success(request, "Пост был успешно удален.")
+        except UnauthorizedError as exc:
+            messages.error(request, str(exc))
+        return redirect(self.success_url)

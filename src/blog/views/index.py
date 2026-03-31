@@ -1,31 +1,25 @@
 from django.contrib import messages
-from django.core.mail import send_mail
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.generic import TemplateView
 
-from blog.forms import (
-    ContactForm,
-)
-from config.settings import DOMAIN_NAME, EMAIL_RECIPIENT, EMAIL_SENDER
+from blog.container import contact_service
+from blog.forms import ContactForm
+from config.settings import DOMAIN_NAME
 
 
 def index(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
-            mail = send_mail(
-                form.cleaned_data["subject"],
-                form.cleaned_data["message"],
-                EMAIL_SENDER,
-                [EMAIL_RECIPIENT],
-                fail_silently=True,
+            sent = contact_service.send_simple_email(
+                subject=form.cleaned_data["subject"],
+                message=form.cleaned_data["message"],
             )
-            if mail:
+            if sent:
                 messages.success(request, "Письмо отправлено")
                 return redirect("contact")
-            else:
-                messages.error(request, "Ошибка отправки письма")
+            messages.error(request, "Ошибка отправки письма")
     else:
         form = ContactForm()
     context = {

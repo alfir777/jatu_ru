@@ -34,16 +34,3 @@ docker-compose -f docker-compose.yml up -d
 ```
  docker exec -it web python3 manage.py createsuperuser
 ```
-Возможны проблемы с правами на папки, созданными docker/django
-- Изменить права доступа для директорий на 755 (drwxr-xr-x)
-```
-find /path/to/target/dir -type d -exec chmod 755 {} \;
-```
-- Изменить права доступа для файлов на 644 (-rw-r--r--)
-```
-find /path/to/target/dir -type f -exec chmod 644 {} \;
-```
-- Не всегда выполняются все миграции, принудительно:
-```
- docker exec -it web python3 manage.py migrate --run-syncdb
-```
