@@ -1,6 +1,6 @@
 # Блог JaTu.Ru
 
-<img src="https://github.com/alfir777/jatu_ru/actions/workflows/cd.yml/badge.svg?branch=master">
+<img src="https://github.com/alfir777/jatu_ru/actions/workflows/deploy.yml/badge.svg?branch=master">
 
 Блог на Django 3, реализован без привязки к домену
 
